@@ -413,7 +413,6 @@ if (depositSubmitBtn) {
     };
 }
 
-// Video Popup Logic
 const openVideoPopupBtn = document.getElementById('open-video-popup-btn');
 if (openVideoPopupBtn) {
     openVideoPopupBtn.onclick = () => {
@@ -425,14 +424,15 @@ if (openVideoPopupBtn) {
                     <title>특별 강의 크게 보기</title>
                     <style>
                         body { margin: 0; background-color: black; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
-                        video { width: 100%; height: 100%; object-fit: contain; }
+                        iframe { width: 100%; height: 100%; border: none; }
                     </style>
                 </head>
                 <body>
-                    <video controls autoplay>
-                        <source src="들기름.mp4" type="video/mp4">
-                        동영상을 지원하지 않는 브라우저입니다.
-                    </video>
+                    <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1" 
+                        title="YouTube video player" frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                    </iframe>
                 </body>
                 </html>
             `);
@@ -493,14 +493,14 @@ function updateAuthUI() {
         // Lecture Video Access (Only C and Admin)
         if (currentUser.username === 'admin' || grade === 'C') {
             if (videoLockOverlay) videoLockOverlay.style.display = 'none';
-            if (lectureVideo) lectureVideo.controls = true;
+            // if (lectureVideo) lectureVideo.controls = true; // Use iframe controls
             if (openVideoPopupBtn) openVideoPopupBtn.style.display = 'block';
         } else {
             if (videoLockOverlay) videoLockOverlay.style.display = 'flex';
-            if (lectureVideo) {
-                lectureVideo.controls = false;
-                lectureVideo.pause();
-            }
+            // if (lectureVideo) {
+            // lectureVideo.controls = false;
+            // lectureVideo.pause(); // Cannot pause iframe easily without API, overlay prevents click
+            // }
             if (openVideoPopupBtn) openVideoPopupBtn.style.display = 'none';
         }
 
@@ -524,10 +524,10 @@ function updateAuthUI() {
 
         // Lock Video for Guests
         if (videoLockOverlay) videoLockOverlay.style.display = 'flex';
-        if (lectureVideo) {
-            lectureVideo.controls = false;
-            lectureVideo.pause();
-        }
+        // if (lectureVideo) {
+        //     lectureVideo.controls = false;
+        //     lectureVideo.pause();
+        // }
         if (openVideoPopupBtn) openVideoPopupBtn.style.display = 'none';
 
         // Allow guests to see list, but not input
