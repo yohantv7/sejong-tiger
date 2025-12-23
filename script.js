@@ -428,7 +428,7 @@ if (openVideoPopupBtn) {
                     </style>
                 </head>
                 <body>
-                    <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1" 
+                    <iframe src="https://www.youtube.com/embed/coi0usPOiKU?autoplay=1" 
                         title="YouTube video player" frameborder="0" 
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                         allowfullscreen>
