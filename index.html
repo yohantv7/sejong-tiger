@@ -131,11 +131,18 @@
                         <textarea id="request-input" placeholder="메시지를 입력하세요..."></textarea>
                         <button id="send-request-btn">등록하기</button>
                     </div>
-                    <button id="open-deposit-modal-btn" class="secondary-btn"
-                        style="width:100%; margin-bottom:5px; margin-top: 15px;">💸
-                        입금 확인 요청 (등급 UP)</button>
-                    <div class="request-list-container" style="margin-top: 0px;">
+                    <div class="request-list-container"
+                        style="margin-top: 10px; margin-bottom: 15px; height: 200px; overflow-y: auto;">
                         <ul id="request-list"></ul>
+                    </div>
+                    <button id="open-deposit-modal-btn" class="secondary-btn" style="width:100%; margin-bottom:15px;">💸
+                        입금 확인 요청 (등급 UP)</button>
+
+                    <div id="deposit-list-container"
+                        style="margin-top: 10px; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 10px; display: none;">
+                        <h4 style="font-size: 0.9rem; color: var(--accent-secondary); margin-bottom: 8px;">💸 입금 요청 내역
+                            (관리자용)</h4>
+                        <ul id="deposit-list" style="list-style: none; padding: 0;"></ul>
                     </div>
 
                     <div id="user-management-section" style="display: none;">

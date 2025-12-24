@@ -274,20 +274,27 @@ if (todoInput) {
 const requestInput = document.getElementById('request-input');
 const sendRequestBtn = document.getElementById('send-request-btn');
 const requestList = document.getElementById('request-list');
+const depositList = document.getElementById('deposit-list');
 
 // No longer using localStorage for requests
 let guestRequests = [];
 
 function renderRequests() {
-    if (!requestList) return;
-    requestList.innerHTML = '';
+    if (requestList) requestList.innerHTML = '';
+    if (depositList) depositList.innerHTML = '';
 
     // Always render for everyone (Guestbook mode)
     // if (!currentUser) return; // REMOVED to allow global visibility
 
     guestRequests.forEach(req => {
+        const isDepositRequest = req.text.includes('[💸 입금 확인 요청]');
+        const targetList = isDepositRequest ? depositList : requestList;
+
+        if (!targetList) return;
+
         const li = document.createElement('li');
         li.className = 'request-item';
+        if (isDepositRequest) li.style.padding = '8px';
 
         let displayDate = "";
         if (req.timestamp) {
@@ -316,7 +323,7 @@ function renderRequests() {
             delBtn.onclick = () => deleteRequest(req.id);
         }
 
-        requestList.appendChild(li);
+        targetList.appendChild(li);
     });
 }
 
@@ -486,6 +493,7 @@ let authMode = 'login'; // 'login' or 'register'
 function updateAuthUI() {
     const requestInputArea = document.querySelector('.request-input-group');
     const requestListContainer = document.querySelector('.request-list-container');
+    const depositListContainer = document.getElementById('deposit-list-container');
     const requestHint = document.querySelector('.request-section p');
     const adminEditors = document.querySelectorAll('.admin-daily-editor');
     const downloadBtns = document.querySelectorAll('.download-btn');
@@ -505,6 +513,11 @@ function updateAuthUI() {
 
         if (requestListContainer) requestListContainer.style.display = 'block';
         // renderRequests(); // Listener handles this
+
+        // Deposit List (Admin only)
+        if (depositListContainer) {
+            depositListContainer.style.display = (currentUser.username === 'admin') ? 'block' : 'none';
+        }
 
         // Show download buttons based on grade
         // Admin, Grade B, Grade C can download
@@ -558,6 +571,7 @@ function updateAuthUI() {
         if (requestInputArea) requestInputArea.style.display = 'none';
         if (requestHint) requestHint.textContent = '로그인 후 요청사항 작성이 가능합니다.';
         if (requestListContainer) requestListContainer.style.display = 'block';
+        if (depositListContainer) depositListContainer.style.display = 'none';
     }
 }
 
