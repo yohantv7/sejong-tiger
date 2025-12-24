@@ -479,7 +479,13 @@ function updateAuthUI() {
         if (requestInputArea) requestInputArea.style.display = 'flex';
         if (requestHint) requestHint.textContent = '나에게 요청사항이 있으면 알려주세요';
 
-        if (requestListContainer) requestListContainer.style.display = 'block';
+        if (requestListContainer) {
+            if (currentUser.username === 'admin') {
+                requestListContainer.style.display = 'block';
+            } else {
+                requestListContainer.style.display = 'none';
+            }
+        }
         // renderRequests(); // Listener handles this
 
         // Show download buttons based on grade
@@ -533,7 +539,7 @@ function updateAuthUI() {
         // Allow guests to see list, but not input
         if (requestInputArea) requestInputArea.style.display = 'none';
         if (requestHint) requestHint.textContent = '로그인 후 요청사항 작성이 가능합니다.';
-        if (requestListContainer) requestListContainer.style.display = 'block';
+        if (requestListContainer) requestListContainer.style.display = 'none';
     }
 }
 
