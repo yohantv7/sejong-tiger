@@ -72,6 +72,15 @@ body {
     opacity: 0.7;
 }
 
+.visitor-display {
+    font-size: 0.85rem;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    margin-left: 10px;
+}
+
 .auth-separator {
     width: 1px;
     height: 20px;

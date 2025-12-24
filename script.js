@@ -770,6 +770,38 @@ function initDailyLife(prefix) {
     }
 }
 
+// Visitor Counter Logic
+function initVisitorCounter() {
+    const visitorEl = document.getElementById('visitor-count');
+    const docRef = db.collection('siteStats').doc('visitors');
+
+    // Realtime Listener
+    docRef.onSnapshot((doc) => {
+        if (doc.exists) {
+            const count = doc.data().count || 0;
+            if (visitorEl) visitorEl.textContent = `방문자: ${count.toLocaleString()}명`;
+        } else {
+            // Initialize if missing
+            if (visitorEl) visitorEl.textContent = `방문자: 0명`;
+        }
+    });
+
+    // Increment Count (Session based)
+    const hasVisited = sessionStorage.getItem('hasVisited');
+    if (!hasVisited) {
+        docRef.set({
+            count: firebase.firestore.FieldValue.increment(1)
+        }, { merge: true })
+            .then(() => {
+                console.log("Visitor count incremented");
+                sessionStorage.setItem('hasVisited', 'true');
+            })
+            .catch((error) => {
+                console.error("Error incrementing visitor count: ", error);
+            });
+    }
+}
+
 
 // Initial calls
 document.addEventListener('DOMContentLoaded', () => {
@@ -779,6 +811,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Listeners start
         initRequestSync();
+        initVisitorCounter();
         populateTimeSelectors(); // Populating time dropdowns
         initDailyLife('ryeoeun');
         initDailyLife('ryeoeun');
