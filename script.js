@@ -301,9 +301,21 @@ function renderRequests() {
         const authorTag = `<small style="display:inline-block; opacity:0.6; margin-bottom:4px; font-weight:bold;">${req.author}</small>`;
 
         li.innerHTML = `
-            ${authorTag} ${displayDate}
-            <div>${req.text}</div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div>
+                    ${authorTag} ${displayDate}
+                    <div style="word-break: break-all;">${req.text}</div>
+                </div>
+                ${currentUser && currentUser.username === 'admin' ?
+                `<button class="delete-req-btn" style="background:none; border:none; cursor:pointer; font-size:1.1rem; opacity:0.7;">🗑️</button>` : ''}
+            </div>
         `;
+
+        const delBtn = li.querySelector('.delete-req-btn');
+        if (delBtn) {
+            delBtn.onclick = () => deleteRequest(req.id);
+        }
+
         requestList.appendChild(li);
     });
 }
@@ -315,12 +327,24 @@ function initRequestSync() {
         .onSnapshot((snapshot) => {
             guestRequests = [];
             snapshot.forEach((doc) => {
-                guestRequests.push(doc.data());
+                guestRequests.push({ id: doc.id, ...doc.data() });
             });
             renderRequests();
         }, (error) => {
             console.error("Error getting requests: ", error);
         });
+}
+
+function deleteRequest(id) {
+    if (!currentUser || currentUser.username !== 'admin') return;
+    if (confirm("정말 이 메시지를 삭제하시겠습니까?")) {
+        db.collection("guestRequests").doc(id).delete()
+            .then(() => {
+                console.log("Document successfully deleted!");
+            }).catch((error) => {
+                console.error("Error removing document: ", error);
+            });
+    }
 }
 
 function sendRequest() {
