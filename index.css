@@ -72,13 +72,14 @@ body {
     opacity: 0.7;
 }
 
-.visitor-display {
-    font-size: 0.85rem;
-    padding: 6px 12px;
+.visitor-display-bottom {
+    font-size: 0.9rem;
+    padding: 8px 16px;
     background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
+    border-radius: 20px;
     border: 1px solid var(--glass-border);
-    margin-left: 10px;
+    display: inline-block;
+    color: rgba(255, 255, 255, 0.7);
 }
 
 .auth-separator {
