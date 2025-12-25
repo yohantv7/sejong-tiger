@@ -11,6 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 </head>
 
@@ -172,8 +173,9 @@
                 <button id="tab-register" class="tab-btn">회원가입</button>
             </div>
             <div class="auth-form">
-                <input type="text" id="auth-username" placeholder="아이디">
-                <input type="password" id="auth-password" placeholder="비밀번호">
+                <input type="email" id="auth-email" placeholder="이메일">
+                <input type="text" id="auth-username" placeholder="이름 (닉네임)">
+                <input type="password" id="auth-password" placeholder="비밀번호 (6자 이상)">
                 <button id="auth-submit-btn">로그인</button>
             </div>
         </div>

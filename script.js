@@ -474,7 +474,7 @@ if (openVideoPopupBtn) {
     };
 }
 
-// Auth Logic (Keep LocalStorage for now to avoid complexity)
+// Auth Logic (Firebase Authentication)
 const authBtn = document.getElementById('auth-btn');
 const authModal = document.getElementById('auth-modal');
 const closeModal = document.getElementById('close-modal');
@@ -482,13 +482,39 @@ const tabLogin = document.getElementById('tab-login');
 const tabRegister = document.getElementById('tab-register');
 const modalTitle = document.getElementById('modal-title');
 const authSubmitBtn = document.getElementById('auth-submit-btn');
+const emailInput = document.getElementById('auth-email');
 const usernameInput = document.getElementById('auth-username');
 const passwordInput = document.getElementById('auth-password');
 const userInfo = document.getElementById('user-info');
 
-let users = JSON.parse(localStorage.getItem('users')) || [];
-let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+let currentUser = null; // Holds Firestore user data
 let authMode = 'login'; // 'login' or 'register'
+
+// Auth State Observer
+firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+        // User is signed in.
+        console.log("User signed in: ", user.email);
+        // Fetch user details from Firestore
+        db.collection('users').doc(user.uid).get().then((doc) => {
+            if (doc.exists) {
+                currentUser = { uid: user.uid, ...doc.data() };
+                localStorage.setItem('currentUser', JSON.stringify(currentUser)); // Optional backup
+                updateAuthUI();
+            } else {
+                console.log("No user profile found in Firestore.");
+            }
+        }).catch((error) => {
+            console.log("Error getting document:", error);
+        });
+    } else {
+        // User is signed out.
+        console.log("User signed out");
+        currentUser = null;
+        localStorage.removeItem('currentUser');
+        updateAuthUI();
+    }
+});
 
 function updateAuthUI() {
     const requestInputArea = document.querySelector('.request-input-group');
@@ -504,7 +530,11 @@ function updateAuthUI() {
     if (currentUser) {
         // Show grade in greeting
         const grade = currentUser.grade || 'A';
-        if (userInfo) userInfo.textContent = `${currentUser.username}님 (${grade}등급), 환영합니다!`;
+        if (userInfo) {
+            userInfo.textContent = (currentUser.grade === 'admin')
+                ? `admin님, 환영합니다!`
+                : `${currentUser.username}님 (${grade}등급), 환영합니다!`;
+        }
         if (authBtn) authBtn.textContent = '로그아웃';
         updateGreeting(new Date().getHours());
 
@@ -512,37 +542,30 @@ function updateAuthUI() {
         if (requestHint) requestHint.textContent = '나에게 요청사항이 있으면 알려주세요';
 
         if (requestListContainer) requestListContainer.style.display = 'block';
-        // renderRequests(); // Listener handles this
 
         // Deposit List (Admin only)
         if (depositListContainer) {
-            depositListContainer.style.display = (currentUser.username === 'admin') ? 'block' : 'none';
+            depositListContainer.style.display = (currentUser.grade === 'admin') ? 'block' : 'none';
         }
 
         // Show download buttons based on grade
-        // Admin, Grade B, Grade C can download
-        if (currentUser.username === 'admin' || grade === 'B' || grade === 'C') {
+        if (currentUser.grade === 'admin' || grade === 'B' || grade === 'C') {
             downloadBtns.forEach(btn => btn.style.display = 'block');
         } else {
             downloadBtns.forEach(btn => btn.style.display = 'none');
         }
 
-        // Lecture Video Access (Only C and Admin)
-        if (currentUser.username === 'admin' || grade === 'C') {
+        // Lecture Video Access
+        if (currentUser.grade === 'admin' || grade === 'C') {
             if (videoLockOverlay) videoLockOverlay.style.display = 'none';
-            // if (lectureVideo) lectureVideo.controls = true; // Use iframe controls
             if (openVideoPopupBtn) openVideoPopupBtn.style.display = 'block';
         } else {
             if (videoLockOverlay) videoLockOverlay.style.display = 'flex';
-            // if (lectureVideo) {
-            // lectureVideo.controls = false;
-            // lectureVideo.pause(); // Cannot pause iframe easily without API, overlay prevents click
-            // }
             if (openVideoPopupBtn) openVideoPopupBtn.style.display = 'none';
         }
 
         const userMgmtSection = document.getElementById('user-management-section');
-        if (currentUser.username === 'admin') {
+        if (currentUser.grade === 'admin') {
             if (userMgmtSection) userMgmtSection.style.display = 'block';
             adminEditors.forEach(editor => editor.style.display = 'block');
             renderUserList();
@@ -557,17 +580,11 @@ function updateAuthUI() {
         const userMgmtSection = document.getElementById('user-management-section');
         if (userMgmtSection) userMgmtSection.style.display = 'none';
         adminEditors.forEach(editor => editor.style.display = 'none');
-        downloadBtns.forEach(btn => btn.style.display = 'none'); // Hide download buttons
+        downloadBtns.forEach(btn => btn.style.display = 'none');
 
-        // Lock Video for Guests
         if (videoLockOverlay) videoLockOverlay.style.display = 'flex';
-        // if (lectureVideo) {
-        //     lectureVideo.controls = false;
-        //     lectureVideo.pause();
-        // }
         if (openVideoPopupBtn) openVideoPopupBtn.style.display = 'none';
 
-        // Allow guests to see list, but not input
         if (requestInputArea) requestInputArea.style.display = 'none';
         if (requestHint) requestHint.textContent = '로그인 후 요청사항 작성이 가능합니다.';
         if (requestListContainer) requestListContainer.style.display = 'block';
@@ -582,6 +599,7 @@ function showAuthModal() {
 
 function hideAuthModal() {
     if (authModal) authModal.classList.remove('active');
+    if (emailInput) emailInput.value = '';
     if (usernameInput) usernameInput.value = '';
     if (passwordInput) passwordInput.value = '';
 }
@@ -593,21 +611,24 @@ function setAuthMode(mode) {
         if (authSubmitBtn) authSubmitBtn.textContent = '로그인';
         if (tabLogin) tabLogin.classList.add('active');
         if (tabRegister) tabRegister.classList.remove('active');
+        if (usernameInput) usernameInput.style.display = 'none'; // Hide name on login
     } else {
         if (modalTitle) modalTitle.textContent = '회원가입';
         if (authSubmitBtn) authSubmitBtn.textContent = '회원가입';
         if (tabLogin) tabLogin.classList.remove('active');
         if (tabRegister) tabRegister.classList.add('active');
+        if (usernameInput) usernameInput.style.display = 'block'; // Show name on register
     }
 }
 
 if (authBtn) {
     authBtn.onclick = () => {
         if (currentUser) {
-            currentUser = null;
-            localStorage.removeItem('currentUser');
-            updateAuthUI();
-            updateGreeting(new Date().getHours());
+            firebase.auth().signOut().then(() => {
+                alert("로그아웃 되었습니다.");
+            }).catch((error) => {
+                console.error("Sign out error", error);
+            });
         } else {
             showAuthModal();
         }
@@ -620,34 +641,54 @@ if (tabRegister) tabRegister.onclick = () => setAuthMode('register');
 
 if (authSubmitBtn) {
     authSubmitBtn.onclick = () => {
-        const username = usernameInput.value.trim();
+        const email = emailInput.value.trim();
         const password = passwordInput.value.trim();
 
-        if (username === '' || password === '') {
-            alert('아이디와 비밀번호를 입력해주세요.');
+        if (email === '' || password === '') {
+            alert('이메일과 비밀번호를 입력해주세요.');
             return;
         }
 
         if (authMode === 'register') {
-            if (users.find(u => u.username === username)) {
-                alert('이미 존재하는 아이디입니다.');
+            const username = usernameInput.value.trim();
+            if (username === '') {
+                alert('이름(닉네임)을 입력해주세요.');
                 return;
             }
-            // Default grade is 'A'
-            users.push({ username, password, grade: 'A' });
-            localStorage.setItem('users', JSON.stringify(users));
-            alert('회원가입이 완료되었습니다! (기본 A등급)');
-            setAuthMode('login');
+
+            firebase.auth().createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Signed in 
+                    const user = userCredential.user;
+
+                    // Create user document in Firestore
+                    return db.collection('users').doc(user.uid).set({
+                        username: username,
+                        email: email,
+                        grade: 'A', // Default grade
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                })
+                .then(() => {
+                    alert('회원가입이 완료되었습니다!');
+                    hideAuthModal();
+                })
+                .catch((error) => {
+                    console.error("Registration Error", error);
+                    alert("회원가입 실패: " + error.message);
+                });
+
         } else {
-            const user = users.find(u => u.username === username && u.password === password);
-            if (user) {
-                currentUser = user;
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                hideAuthModal();
-                updateAuthUI();
-            } else {
-                alert('아이디 또는 비밀번호가 틀렸습니다.');
-            }
+            // Login
+            firebase.auth().signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Signed in
+                    hideAuthModal();
+                })
+                .catch((error) => {
+                    console.error("Login Error", error);
+                    alert("로그인 실패: " + error.message);
+                });
         }
     };
 }
