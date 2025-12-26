@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>주식 인사이트 허브 - Stock Insight Hub</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Noto+Sans+KR:wght@300;400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        /* Stock Page Specific Styles (Inline for now, can move to index.css) */
+        body {
+            background: #0f172a;
+            /* Darker Navy for Finance feel */
+            color: #ffffff;
+            font-family: 'Noto Sans KR', 'Outfit', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .stock-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .stock-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffd700;
+            /* Gold */
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            margin-left: 20px;
+            font-size: 1rem;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #ffd700;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            margin: 40px 0 20px 0;
+            border-left: 5px solid #ffd700;
+            padding-left: 15px;
+            color: #f1f5f9;
+        }
+
+        /* TradingView Widget Containers */
+        .widget-container {
+            margin-bottom: 30px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Affiliate Section Styles */
+        .affiliate-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+
+        .product-card {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.15);
+            /* Gold glow */
+            border-color: rgba(255, 215, 0, 0.3);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #ffd700;
+            color: #000;
+            font-weight: bold;
+            font-size: 0.8rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .product-img {
+            width: 120px;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .product-info h3 {
+            margin: 10px 0;
+            font-size: 1.2rem;
+            color: #f8fafc;
+        }
+
+        .product-desc {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            flex-grow: 1;
+            /* Pushes button down */
+        }
+
+        .buy-btn {
+            display: inline-block;
+            width: 100%;
+            padding: 12px 0;
+            background: linear-gradient(135deg, #ffd700, #f59e0b);
+            color: #0f172a;
+            font-weight: 700;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: filter 0.2s;
+        }
+
+        .buy-btn:hover {
+            filter: brightness(1.1);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="stock-header">
+        <a href="stock.html" class="stock-logo">
+            📈 S.Insight
+        </a>
+        <nav class="nav-links">
+            <a href="index.html">🏠 홈페이지로</a>
+            <a href="#">시장 지표</a>
+            <a href="#">추천 도서</a>
+        </nav>
+    </header>
+
+    <!-- 1. Ticker Tape Widget (Top Banner) -->
+    <div class="tradingview-widget-container">
+        <div class="tradingview-widget-container__widget"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js"
+            async>
+                {
+                    "symbols": [
+                        {
+                            "proName": "FOREXCOM:SPXUSD",
+                            "title": "S&P 500"
+                        },
+                        {
+                            "proName": "FOREXCOM:NSXUSD",
+                            "title": "US 100"
+                        },
+                        {
+                            "description": "KOSPI",
+                            "proName": "KRX:KOSPI"
+                        },
+                        {
+                            "description": "USD/KRW",
+                            "proName": "FX_IDC:USDKRW"
+                        },
+                        {
+                            "description": "Bitcoin",
+                            "proName": "BITSTAMP:BTCUSD"
+                        }
+                    ],
+                        "showSymbolLogo": true,
+                            "isTransparent": false,
+                                "displayMode": "adaptive",
+                                    "colorTheme": "dark",
+                                        "locale": "kr"
+                }
+            </script>
+    </div>
+
+    <div class="container">
+        <!-- 2. Market Overview -->
+        <h2 class="section-title">글로벌 시장 현황</h2>
+        <div class="widget-container" style="height: 600px;">
+            <!-- TradingView Widget BEGIN -->
+            <div class="tradingview-widget-container" style="height:100%;width:100%">
+                <div class="tradingview-widget-container__widget" style="height:calc(100% - 32px);width:100%"></div>
+                <script type="text/javascript"
+                    src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+                        {
+                            "autosize": true,
+                                "symbol": "KRX:KOSPI",
+                                    "interval": "D",
+                                        "timezone": "Asia/Seoul",
+                                            "theme": "dark",
+                                                "style": "1",
+                                                    "locale": "kr",
+                                                        "enable_publishing": false,
+                                                            "backgroundColor": "rgba(15, 23, 42, 1)",
+                                                                "gridColor": "rgba(255, 255, 255, 0.05)",
+                                                                    "hide_top_toolbar": false,
+                                                                        "hide_legend": false,
+                                                                            "allow_symbol_change": true,
+                                                                                "save_image": false,
+                                                                                    "calendar": false,
+                                                                                        "support_host": "https://www.tradingview.com"
+                        }
+                    </script>
+            </div>
+            <!-- TradingView Widget END -->
+        </div>
+
+        <!-- 3. Affiliate Section: Curated Library -->
+        <h2 class="section-title">투자의 지혜를 얻는 서재 📚</h2>
+        <div class="affiliate-grid">
+            <!-- Product Card 1 -->
+            <div class="product-card glass-panel">
+                <div class="product-badge">Best Seller</div>
+                <img src="https://image.yes24.com/goods/96547408/XL" alt="돈의 심리학" class="product-img">
+                <div class="product-info">
+                    <h3>돈의 심리학</h3>
+                    <p class="product-desc">부자가 되는 데 필요한 것은 지능이 아니라 행동이다. 투자 마인드셋을 위한 최고의 입문서.</p>
+                    <a href="https://link.coupang.com/a/die9Y3" class="buy-btn" target="_blank"
+                        referrerpolicy="no-referrer">최저가 확인하기 🚀</a>
+                </div>
+            </div>
+
+            <!-- Product Card 2 -->
+            <div class="product-card glass-panel">
+                <div class="product-badge">Classic</div>
+                <img src="https://image.yes24.com/goods/90568058/XL" alt="현명한 투자자" class="product-img">
+                <div class="product-info">
+                    <h3>현명한 투자자</h3>
+                    <p class="product-desc">워런 버핏이 "내 인생을 바꾼 책"이라고 극찬한 가치 투자의 바이블.</p>
+                    <a href="https://link.coupang.com/a/die8Vf" class="buy-btn" target="_blank"
+                        referrerpolicy="no-referrer">최저가 확인하기 🚀</a>
+                </div>
+            </div>
+
+            <!-- Product Card 3 (Tech/Tool) -->
+            <div class="product-card glass-panel">
+                <div class="product-badge">Trader's Pick</div>
+                <img src="https://m.media-amazon.com/images/I/61LO21cQ9yL._AC_SL1500_.jpg" alt="로지텍 MX Master 3S"
+                    class="product-img">
+                <div class="product-info">
+                    <h3>로지텍 MX Master 3S</h3>
+                    <p class="product-desc">전업 투자자들이 가장 사랑하는 무소음 마우스. 장시간 차트 분석에도 손목이 편안합니다.</p>
+                    <a href="https://link.coupang.com/a/difkRj" class="buy-btn" target="_blank"
+                        referrerpolicy="no-referrer">최저가 확인하기 🚀</a>
+                </div>
+            </div>
+        </div>
+
+        <p style="text-align: center; color: #94a3b8; margin-top: 50px;">
+            이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.<br>
+            모든 데이터는 실시간으로 제공되며, 투자 판단의 책임은 본인에게 있습니다.
+        </p>
+    </div>
+
+</body>
+
+</html>

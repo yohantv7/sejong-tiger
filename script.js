@@ -487,6 +487,7 @@ const usernameInput = document.getElementById('auth-username');
 const passwordInput = document.getElementById('auth-password');
 const userInfo = document.getElementById('user-info');
 
+let users = []; // Initialize empty array for users (fetched from specific query if needed)
 let currentUser = null; // Holds Firestore user data
 let authMode = 'login'; // 'login' or 'register'
 
