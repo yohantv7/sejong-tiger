@@ -184,32 +184,29 @@
         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js"
             async>
                 {
-                    {
-                        "proName": "FOREXCOM:SPXUSD",
-                            "title": "S&P 500"
-                    },
-                    {
-                        "proName": "FOREXCOM:NSXUSD",
-                            "title": "US 100"
-                    },
-                    {
-                        "description": "Samsung Electronics",
-                            "proName": "KRX:005930"
-                    },
-                    {
-                        "description": "USD/KRW",
-                            "proName": "FX_IDC:USDKRW"
-                    },
-                    {
-                        "description": "Bitcoin",
-                            "proName": "BITSTAMP:BTCUSD"
-                    }
+                    "symbols": [
+                        {
+                            "proName": "AMEX:SPY",
+                            "title": "S&P 500 ETF"
+                        },
+                        {
+                            "proName": "NASDAQ:QQQ",
+                            "title": "NASDAQ 100 ETF"
+                        },
+                        {
+                            "proName": "BITSTAMP:BTCUSD",
+                            "title": "Bitcoin"
+                        },
+                        {
+                            "proName": "FX_IDC:USDKRW",
+                            "title": "USD/KRW"
+                        }
                     ],
-                    "showSymbolLogo": true,
-                        "isTransparent": false,
-                            "displayMode": "adaptive",
-                                "colorTheme": "dark",
-                                    "locale": "kr"
+                        "showSymbolLogo": true,
+                            "isTransparent": false,
+                                "displayMode": "adaptive",
+                                    "colorTheme": "dark",
+                                        "locale": "kr"
                 }
             </script>
     </div>
@@ -225,7 +222,7 @@
                     src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
                         {
                             "autosize": true,
-                                "symbol": "KRX:005930",
+                                "symbol": "NASDAQ:QQQ",
                                     "interval": "D",
                                         "timezone": "Asia/Seoul",
                                             "theme": "dark",
