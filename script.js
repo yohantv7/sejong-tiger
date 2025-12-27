@@ -147,7 +147,7 @@ function renderTodos() {
             li.innerHTML = `
                 <div class="checkbox"></div>
                 <span>${todo.text}</span>
-                ${todo.time ? `<span class="todo-deadline">${todo.time}까지</span>` : ''}
+                ${todo.time ? `&nbsp;&nbsp;&nbsp;<span class="todo-deadline">${todo.time}까지</span>` : ''}
                 <div class="todo-actions">
                     <button class="edit-btn">수정</button>
                     <button class="delete-btn">삭제</button>
