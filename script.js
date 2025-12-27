@@ -305,22 +305,24 @@ function renderRequests() {
             try {
                 // Formatting timestamp
                 const d = req.timestamp.toDate ? req.timestamp.toDate() : new Date(req.timestamp);
-                displayDate = `<span style="font-size:0.7em; color:#aaa; margin-left:8px;">${d.getMonth() + 1}/${d.getDate()}</span>`;
+                displayDate = `< span style = "font-size:0.7em; color:#aaa; margin-left:8px;" > ${d.getMonth() + 1
+                    } /${d.getDate()}</span > `;
             } catch (e) { }
         }
 
-        const authorTag = `<small style="display:inline-block; opacity:0.6; margin-bottom:4px; font-weight:bold;">${req.author}</small>`;
+        const authorTag = `< small style = "display:inline-block; opacity:0.6; margin-bottom:4px; font-weight:bold;" > ${req.author}</small > `;
 
         li.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                <div>
-                    ${authorTag} ${displayDate}
-                    <div style="word-break: break-all;">${req.text}</div>
-                </div>
+    < div style = "display:flex; justify-content:space-between; align-items:flex-start;" >
+        <div>
+            ${authorTag} ${displayDate}
+            <div style="word-break: break-all;">${req.text}</div>
+        </div>
                 ${currentUser && (currentUser.username === 'admin' || currentUser.grade === 'admin') ?
-                `<button class="delete-req-btn" style="background:none; border:none; cursor:pointer; font-size:1.1rem; opacity:0.7;">🗑️</button>` : ''}
-            </div>
-        `;
+                `<button class="delete-req-btn" style="background:none; border:none; cursor:pointer; font-size:1.1rem; opacity:0.7;">🗑️</button>` : ''
+            }
+            </div >
+    `;
 
         const delBtn = li.querySelector('.delete-req-btn');
         if (delBtn) {
@@ -426,7 +428,7 @@ if (depositSubmitBtn) {
         }
 
         // Create formatted message
-        const message = `[💸 입금 확인 요청] 입금자: ${name} / 금액: ${amount}원`;
+        const message = `[💸 입금 확인 요청]입금자: ${name} / 금액: ${amount}원`;
 
         // Send to Guestbook
         const requestObj = {
@@ -945,8 +947,43 @@ document.addEventListener('DOMContentLoaded', () => {
         initDailyLife('ryeoeun');
 
         renderUserList();
+        fetchWeather(); // Initial weather fetch
 
     } catch (err) {
         console.error(err);
     }
 });
+
+// Weather Function using Open-Meteo
+async function fetchWeather() {
+    const weatherEl = document.getElementById('weather');
+    if (!weatherEl) return;
+
+    try {
+        // Seoul Coordinates: 37.5665, 126.9780
+        const response = await fetch('https://api.open-meteo.com/v1/forecast?latitude=37.5665&longitude=126.9780&current_weather=true&timezone=Asia%2FTokyo');
+        const data = await response.json();
+
+        if (data && data.current_weather) {
+            const temp = Math.round(data.current_weather.temperature);
+            const code = data.current_weather.weathercode;
+
+            // Weather Codes: https://open-meteo.com/en/docs
+            let icon = '☀️';
+            if (code >= 1 && code <= 3) icon = '🌤️';
+            else if (code >= 45 && code <= 48) icon = '🌫️';
+            else if (code >= 51 && code <= 67) icon = '🌧️';
+            else if (code >= 71 && code <= 77) icon = '❄️';
+            else if (code >= 80 && code <= 82) icon = '🌦️';
+            else if (code >= 95) icon = '⚡';
+
+            weatherEl.textContent = `${icon} ${temp}°C`;
+        }
+    } catch (error) {
+        console.error("Weather fetch error:", error);
+        weatherEl.textContent = "";
+    }
+}
+
+// Update weather every hour
+setInterval(fetchWeather, 3600000);
