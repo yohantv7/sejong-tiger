@@ -100,11 +100,11 @@ function updateGreeting(hour) {
 }
 
 // Todo List Logic
-const todoInput = document.getElementById('todo-input');
-const todoHourSelect = document.getElementById('todo-hour');
-const todoMinuteSelect = document.getElementById('todo-minute');
-const addBtn = document.getElementById('add-btn');
+const clockEl = document.getElementById('clock');
+const dateEl = document.getElementById('date');
+const todoInput = document.getElementById('daily-goal-input'); // Renamed to avoid autofill
 const todoList = document.getElementById('todo-list');
+const addBtn = document.getElementById('add-btn');
 
 function renderTodos() {
     if (!todoList) return;
