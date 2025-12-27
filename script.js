@@ -755,9 +755,7 @@ function deleteUser(username) {
 }
 
 // Daily Life Section (Firebase)
-// Daily Life Section (Firebase)
 function initDailyLife(prefix) {
-    // Check if we are in 2-photo mode (Ryeo-eun)
     const displayImg1 = document.getElementById(`${prefix}-display-img-1`);
     const displayImg2 = document.getElementById(`${prefix}-display-img-2`);
 
@@ -765,11 +763,11 @@ function initDailyLife(prefix) {
     const imgUpload1 = document.getElementById(`${prefix}-img-upload-1`);
     const imgUpload2 = document.getElementById(`${prefix}-img-upload-2`);
 
-    // Save buttons - VITAL: Must match HTML IDs
+    // Save buttons
     const saveBtn1 = document.getElementById(`${prefix}-save-btn-1`);
     const saveBtn2 = document.getElementById(`${prefix}-save-btn-2`);
 
-    // Firestore Document Reference: dailyLife/{ryeoeun}
+    // Firestore Document Reference
     const docRef = db.collection('dailyLife').doc(prefix);
 
     // Realtime Listener
@@ -780,36 +778,45 @@ function initDailyLife(prefix) {
             // Handle Photo 1
             if (displayImg1 && data.image1) {
                 displayImg1.src = data.image1;
+                displayImg1.style.display = 'block'; // Ensure visible
             }
             // Handle Photo 2
             if (displayImg2 && data.image2) {
                 displayImg2.src = data.image2;
+                displayImg2.style.display = 'block'; // Ensure visible
             }
         }
     });
 
     // Image Compression Helper
     const compressImage = (base64Str, maxWidth = 800, quality = 0.7) => {
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             const img = new Image();
             img.src = base64Str;
+
             img.onload = () => {
-                const canvas = document.createElement('canvas');
-                let width = img.width;
-                let height = img.height;
+                try {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
 
-                if (width > maxWidth) {
-                    height *= maxWidth / width;
-                    width = maxWidth;
+                    if (width > maxWidth) {
+                        height *= maxWidth / width;
+                        width = maxWidth;
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    resolve(canvas.toDataURL('image/jpeg', quality));
+                } catch (e) {
+                    reject(e);
                 }
-
-                canvas.width = width;
-                canvas.height = height;
-
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
-                resolve(canvas.toDataURL('image/jpeg', quality));
             };
+
+            img.onerror = (e) => reject(new Error("Image load failed"));
         });
     };
 
@@ -826,29 +833,28 @@ function initDailyLife(prefix) {
                 reader.onload = async (e) => {
                     let result = e.target.result;
 
-                    // Compress if needed (Check initial size approx > 500KB)
-                    if (result.length > 500000) {
+                    // Simple size check before compression logic
+                    if (result.length > 500000) { // > ~375KB
                         try {
-                            // console.log("Compressing image...");
                             result = await compressImage(result);
                         } catch (err) {
-                            console.error("Compression failed", err);
-                            alert("이미지 압축 중 오류가 발생했습니다.");
-                            return;
+                            console.error("Compression failed, trying original...", err);
+                            // Fallback to original if compression fails, but check size again
                         }
                     }
 
-                    if (result.length > 1048487) { // Still too big?
-                        alert("이미지가 너무 큽니다! 더 작은 이미지를 사용해주세요.");
+                    if (result.length > 1048487) {
+                        alert("이미지 용량이 너무 큽니다 (1MB 초과). 더 작은 사진을 선택해주세요.");
                         return;
                     }
 
                     // Immediate UI update
                     if (displayElement) {
                         displayElement.src = result;
+                        displayElement.style.display = 'block';
                     }
 
-                    // Prepare update data for the specific image field
+                    // Prepare update data
                     const updateData = {
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                     };
@@ -856,12 +862,12 @@ function initDailyLife(prefix) {
 
                     docRef.set(updateData, { merge: true })
                         .then(() => {
-                            alert('이미지가 저장되었습니다! (모든 기기에 반영됩니다) ✨');
-                            uploadInput.value = ''; // Clear input
+                            alert('저장되었습니다! ✨');
+                            uploadInput.value = '';
                         })
                         .catch((error) => {
                             console.error("Error writing document: ", error);
-                            alert("이미지 저장 실패: " + error.message);
+                            alert("저장 실패: " + error.message);
                         });
                 };
                 reader.readAsDataURL(file);
