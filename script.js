@@ -106,6 +106,10 @@ const todoInput = document.getElementById('daily-goal-input'); // Renamed to avo
 const todoList = document.getElementById('todo-list');
 const addBtn = document.getElementById('add-btn');
 
+// Time Selectors
+const todoHourSelect = document.getElementById('todo-hour');
+const todoMinuteSelect = document.getElementById('todo-minute');
+
 function renderTodos() {
     if (!todoList) return;
     todoList.innerHTML = '';
@@ -756,16 +760,21 @@ function deleteUser(username) {
 
 // Daily Life Section (Firebase)
 function initDailyLife(prefix) {
+    console.log(`[DEBUG] Initializing Daily Life for: ${prefix}`);
+
     const displayImg1 = document.getElementById(`${prefix}-display-img-1`);
     const displayImg2 = document.getElementById(`${prefix}-display-img-2`);
+    console.log(`[DEBUG] Img1: ${displayImg1}, Img2: ${displayImg2}`);
 
     // Upload inputs
     const imgUpload1 = document.getElementById(`${prefix}-img-upload-1`);
     const imgUpload2 = document.getElementById(`${prefix}-img-upload-2`);
+    console.log(`[DEBUG] Upload1: ${imgUpload1}, Upload2: ${imgUpload2}`);
 
     // Save buttons
     const saveBtn1 = document.getElementById(`${prefix}-save-btn-1`);
     const saveBtn2 = document.getElementById(`${prefix}-save-btn-2`);
+    console.log(`[DEBUG] Btn1: ${saveBtn1}, Btn2: ${saveBtn2}`);
 
     // Firestore Document Reference
     const docRef = db.collection('dailyLife').doc(prefix);
@@ -773,6 +782,7 @@ function initDailyLife(prefix) {
     // Realtime Listener
     docRef.onSnapshot((doc) => {
         if (doc.exists) {
+            console.log("[DEBUG] Document data loaded:", doc.data());
             const data = doc.data();
 
             // Handle Photo 1
@@ -785,6 +795,8 @@ function initDailyLife(prefix) {
                 displayImg2.src = data.image2;
                 displayImg2.style.display = 'block'; // Ensure visible
             }
+        } else {
+            console.log("[DEBUG] No document found for:", prefix);
         }
     });
 
@@ -822,21 +834,26 @@ function initDailyLife(prefix) {
 
     const handleSave = (btn, uploadInput, fieldName, displayElement) => {
         if (btn && uploadInput) {
-            btn.onclick = () => {
+            btn.addEventListener('click', () => { // Changed to addEventListener
+                console.log(`[DEBUG] Save button clicked for ${fieldName}`);
                 const file = uploadInput.files[0];
                 if (!file) {
                     alert("업로드할 사진을 선택해주세요.");
                     return;
                 }
+                console.log(`[DEBUG] File selected: ${file.name}, size: ${file.size}`);
 
                 const reader = new FileReader();
                 reader.onload = async (e) => {
                     let result = e.target.result;
+                    console.log(`[DEBUG] File read complete. Length: ${result.length}`);
 
                     // Simple size check before compression logic
                     if (result.length > 500000) { // > ~375KB
                         try {
+                            console.log("Compressing image...");
                             result = await compressImage(result);
+                            console.log(`[DEBUG] Compression complete. New Length: ${result.length}`);
                         } catch (err) {
                             console.error("Compression failed, trying original...", err);
                             // Fallback to original if compression fails, but check size again
@@ -862,6 +879,7 @@ function initDailyLife(prefix) {
 
                     docRef.set(updateData, { merge: true })
                         .then(() => {
+                            console.log("[DEBUG] Firestore save success");
                             alert('저장되었습니다! ✨');
                             uploadInput.value = '';
                         })
@@ -871,7 +889,9 @@ function initDailyLife(prefix) {
                         });
                 };
                 reader.readAsDataURL(file);
-            };
+            });
+        } else {
+            console.error(`[DEBUG] Missing elements for ${fieldName} - Btn: ${btn}, Input: ${uploadInput}`);
         }
     };
 
@@ -924,8 +944,6 @@ document.addEventListener('DOMContentLoaded', () => {
         populateTimeSelectors(); // Populating time dropdowns
         initDailyLife('ryeoeun');
 
-        updateAuthUI();
-        renderTodos();
         renderUserList();
 
     } catch (err) {
