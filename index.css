@@ -629,3 +629,33 @@ button {
         transform: translateY(0);
     }
 }
+
+/* Mobile Response for Header */
+@media (max-width: 768px) {
+    .dashboard-header {
+        flex-direction: column;
+        height: auto !important;
+        padding: 15px !important;
+        gap: 15px;
+    }
+
+    .header-left {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .header-right {
+        width: 100%;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    /* Override inline styles for mobile to ensure centering */
+    .nav-link-btn {
+        margin-left: 0 !important;
+        font-size: 0.9rem;
+        padding: 8px 12px !important;
+    }
+}
