@@ -313,7 +313,7 @@ function renderRequests() {
                     ${authorTag} ${displayDate}
                     <div style="word-break: break-all;">${req.text}</div>
                 </div>
-                ${currentUser && currentUser.username === 'admin' ?
+                ${currentUser && (currentUser.username === 'admin' || currentUser.grade === 'admin') ?
                 `<button class="delete-req-btn" style="background:none; border:none; cursor:pointer; font-size:1.1rem; opacity:0.7;">🗑️</button>` : ''}
             </div>
         `;
@@ -343,13 +343,14 @@ function initRequestSync() {
 }
 
 function deleteRequest(id) {
-    if (!currentUser || currentUser.username !== 'admin') return;
-    if (confirm("정말 이 메시지를 삭제하시겠습니까?")) {
+    if (!currentUser || (currentUser.username !== 'admin' && currentUser.grade !== 'admin')) return;
+    if (confirm("정말 이 메시지를 삭제하시겠습니까? (복구할 수 없습니다)")) {
         db.collection("guestRequests").doc(id).delete()
             .then(() => {
-                console.log("Document successfully deleted!");
+                alert("삭제되었습니다.");
             }).catch((error) => {
                 console.error("Error removing document: ", error);
+                alert("삭제 실패: " + error.message);
             });
     }
 }
@@ -523,10 +524,11 @@ function updateAuthUI() {
     const depositListContainer = document.getElementById('deposit-list-container');
     const requestHint = document.querySelector('.request-section p');
     const adminEditors = document.querySelectorAll('.admin-daily-editor');
-    const downloadBtns = document.querySelectorAll('.download-btn');
     const videoLockOverlay = document.getElementById('video-lock-overlay');
-    const lectureVideo = document.getElementById('lecture-video');
     const openVideoPopupBtn = document.getElementById('open-video-popup-btn');
+
+    // Re-render requests to show/hide delete buttons
+    renderRequests();
 
     if (currentUser) {
         // Show grade in greeting
@@ -547,13 +549,6 @@ function updateAuthUI() {
         // Deposit List (Admin only)
         if (depositListContainer) {
             depositListContainer.style.display = (currentUser.grade === 'admin') ? 'block' : 'none';
-        }
-
-        // Show download buttons based on grade
-        if (currentUser.grade === 'admin' || grade === 'B' || grade === 'C') {
-            downloadBtns.forEach(btn => btn.style.display = 'block');
-        } else {
-            downloadBtns.forEach(btn => btn.style.display = 'none');
         }
 
         // Lecture Video Access
@@ -581,7 +576,6 @@ function updateAuthUI() {
         const userMgmtSection = document.getElementById('user-management-section');
         if (userMgmtSection) userMgmtSection.style.display = 'none';
         adminEditors.forEach(editor => editor.style.display = 'none');
-        downloadBtns.forEach(btn => btn.style.display = 'none');
 
         if (videoLockOverlay) videoLockOverlay.style.display = 'flex';
         if (openVideoPopupBtn) openVideoPopupBtn.style.display = 'none';
