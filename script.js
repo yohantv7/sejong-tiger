@@ -761,12 +761,28 @@ function deleteUser(username) {
 }
 
 // Daily Life Section (Firebase)
+// Daily Life Section (Firebase)
 function initDailyLife(prefix) {
+    // Check if we are in 2-photo mode (Ryeo-eun)
+    const displayImg1 = document.getElementById(`${prefix}-display-img-1`);
+    const displayImg2 = document.getElementById(`${prefix}-display-img-2`);
+
+    // Fallback for single photo mode (Yunu)
     const displayImg = document.getElementById(`${prefix}-display-img`);
+
     const displayDesc = document.getElementById(`${prefix}-display-desc`);
-    const imgUpload = document.getElementById(`${prefix}-img-upload`);
+
+    // Upload inputs
+    const imgUpload1 = document.getElementById(`${prefix}-img-upload-1`);
+    const imgUpload2 = document.getElementById(`${prefix}-img-upload-2`);
+    const imgUpload = document.getElementById(`${prefix}-img-upload`); // Single mode upload
+
     const descEdit = document.getElementById(`${prefix}-desc-edit`);
     const saveBtn = document.getElementById(`${prefix}-save-daily-btn`);
+
+    // Download buttons
+    const downloadBtn1 = document.getElementById(`${prefix}-download-btn-1`);
+    const downloadBtn2 = document.getElementById(`${prefix}-download-btn-2`);
     const downloadBtn = document.getElementById(`${prefix}-download-btn`);
 
     // Firestore Document Reference: dailyLife/{ryeoeun}
@@ -776,10 +792,25 @@ function initDailyLife(prefix) {
     docRef.onSnapshot((doc) => {
         if (doc.exists) {
             const data = doc.data();
-            if (data.image && displayImg) displayImg.src = data.image;
+
+            // Handle Multiple Images
+            if (displayImg1 && displayImg2) {
+                if (data.image1) displayImg1.src = data.image1;
+                if (data.image2) {
+                    displayImg2.src = data.image2;
+                    displayImg2.style.display = 'block';
+                } else {
+                    displayImg2.style.display = 'none';
+                }
+            }
+            // Handle Single Image
+            else if (displayImg) {
+                if (data.image) displayImg.src = data.image; // Legacy support
+                else if (data.image1) displayImg.src = data.image1; // Fallback if data structure changes
+            }
+
             if (data.description && displayDesc) displayDesc.textContent = data.description;
             if (data.description && descEdit) {
-                // Only update editor if not currently focused to avoid overwriting user input while typing
                 if (document.activeElement !== descEdit) {
                     descEdit.value = data.description;
                 }
@@ -790,30 +821,25 @@ function initDailyLife(prefix) {
     if (saveBtn) {
         saveBtn.onclick = (e) => {
             if (e) e.preventDefault();
-            const file = imgUpload.files[0];
             const description = descEdit.value.trim();
 
-            // Current image fallback
-            let currentImage = displayImg.src;
-
-            const saveData = (imgSrc) => {
-                // Firestore limit is 1MB. Data URLs for large images might fail.
-                // For a proper app, use Firebase Storage. For this demo, we try to save to Firestore
-                // but warn if too big.
-
-                // Simple Check size ~ 900KB
-                if (imgSrc && imgSrc.length > 900000) {
-                    alert("이미지가 너무 큽니다! (1MB 제한) 더 작은 이미지를 사용해주세요.");
-                    return;
-                }
-
-                docRef.set({
-                    image: imgSrc,
+            const processSave = (img1Data, img2Data) => {
+                const updateData = {
                     description: description,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true })
+                };
+
+                if (img1Data) updateData.image1 = img1Data;
+                if (img2Data) updateData.image2 = img2Data;
+
+                // Legacy single image support
+                if (img1Data && !displayImg1) updateData.image = img1Data;
+
+                docRef.set(updateData, { merge: true })
                     .then(() => {
                         alert('저장되었습니다! (모든 기기에 반영됩니다) ✨');
+                        if (imgUpload1) imgUpload1.value = '';
+                        if (imgUpload2) imgUpload2.value = '';
                         if (imgUpload) imgUpload.value = '';
                     })
                     .catch((error) => {
@@ -822,32 +848,54 @@ function initDailyLife(prefix) {
                     });
             };
 
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => saveData(e.target.result);
-                reader.readAsDataURL(file);
-            } else {
-                saveData(currentImage);
-            }
+            const readFile = (file) => {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+            };
+
+            // Handling uploads
+            const file1 = imgUpload1 ? imgUpload1.files[0] : (imgUpload ? imgUpload.files[0] : null);
+            const file2 = imgUpload2 ? imgUpload2.files[0] : null;
+
+            const promises = [];
+            if (file1) promises.push(readFile(file1)); else promises.push(Promise.resolve(null));
+            if (file2) promises.push(readFile(file2)); else promises.push(Promise.resolve(null));
+
+            Promise.all(promises).then(([img1Res, img2Res]) => {
+                // Size check (simple)
+                if ((img1Res && img1Res.length > 900000) || (img2Res && img2Res.length > 900000)) {
+                    alert("이미지가 너무 큽니다! (1MB 제한) 더 작은 이미지를 사용해주세요.");
+                    return;
+                }
+                processSave(img1Res, img2Res);
+            });
         };
     }
 
-    if (downloadBtn) {
-        downloadBtn.onclick = () => {
-            const imgSrc = displayImg.src;
-            if (!imgSrc) {
-                alert('다운로드할 이미지가 없습니다.');
-                return;
+    const mkDownload = (btn, img) => {
+        if (btn && img) {
+            btn.onclick = () => {
+                if (!img.src || img.style.display === 'none') {
+                    alert('다운로드할 이미지가 없습니다.');
+                    return;
+                }
+                const link = document.createElement('a');
+                link.href = img.src;
+                link.download = `${prefix}_daily_${Date.now()}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
             }
-            const link = document.createElement('a');
-            link.href = imgSrc;
-            // Use timestamp for unique filename
-            link.download = `${prefix}_daily_${Date.now()}.png`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        };
-    }
+        }
+    };
+
+    mkDownload(downloadBtn, displayImg);
+    mkDownload(downloadBtn1, displayImg1);
+    mkDownload(downloadBtn2, displayImg2);
 }
 
 // Visitor Counter Logic
@@ -894,8 +942,6 @@ document.addEventListener('DOMContentLoaded', () => {
         initVisitorCounter();
         populateTimeSelectors(); // Populating time dropdowns
         initDailyLife('ryeoeun');
-        initDailyLife('ryeoeun');
-        initDailyLife('yunu');
 
         updateAuthUI();
         renderTodos();

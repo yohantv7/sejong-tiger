@@ -190,13 +190,29 @@ body {
     overflow-y: auto;
 }
 
+.photo-block {
+    display: flex;
+    flex-direction: column;
+}
+
 .daily-img {
     width: 100%;
     border-radius: 16px;
-    margin-bottom: 12px;
     object-fit: cover;
     aspect-ratio: 1 / 1;
+    margin-bottom: 10px;
     /* Square crop */
+}
+
+/* Remove daily-img-container & download-btn-group styles as they are replaced by structure */
+
+.download-btn-group {
+    display: flex;
+    gap: 10px;
+}
+
+.download-btn-group .download-btn {
+    flex: 1;
 }
 
 .daily-desc {
