@@ -348,6 +348,23 @@ body {
     margin-bottom: 20px;
 }
 
+#daily-goal-input {
+    flex: 1;
+    /* Allow input to shrink/grow */
+    min-width: 0;
+    /* Critical for flex items to shrink below content size */
+}
+
+.time-selector-group {
+    flex-shrink: 0;
+    /* Prevent time selectors from squishing */
+}
+
+#add-btn {
+    flex-shrink: 0;
+    /* Prevent button from squishing */
+}
+
 input[type="text"],
 input[type="time"],
 input[type="password"] {
