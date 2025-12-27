@@ -174,7 +174,8 @@
         <nav class="nav-links">
             <a href="index.html">🏠 홈페이지로</a>
             <a href="#">시장 지표</a>
-            <a href="#">추천 도서</a>
+            <a href="senior.html">fg 시니어</a>
+            <a href="marketing.html">📢 마케팅</a>
         </nav>
     </header>
 
@@ -212,6 +213,33 @@
     </div>
 
     <div class="container">
+        <!-- 2. Market Sentiment (Fear & Greed) -->
+        <h2 class="section-title">시장 심리 (공포 vs 탐욕) 😨🤑</h2>
+        <p style="color: #cbd5e1; margin-bottom: 20px;">
+            S&P 500 시장의 기술적 강도를 통해 심리를 파악합니다. <br>
+            <span style="color: #ef4444;">Strong Sell (공포)</span> ↔ <span style="color: #22c55e;">Strong Buy (탐욕)</span>
+        </p>
+        <div class="glass-panel" style="padding: 20px; margin-bottom: 50px;">
+            <!-- TradingView Widget BEGIN -->
+            <div class="tradingview-widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript"
+                    src="https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js" async>
+                        {
+                            "interval": "1D",
+                                "width": "100%",
+                                    "isTransparent": true,
+                                        "height": 400,
+                                            "symbol": "AMEX:SPY",
+                                                "showIntervalTabs": true,
+                                                    "displayMode": "single",
+                                                        "locale": "kr",
+                                                            "colorTheme": "dark"
+                        }
+                    </script>
+            </div>
+            <!-- TradingView Widget END -->
+        </div>
         <!-- 2. Stock Renamed (No Widget) -->
         <h2 class="section-title">주식고수가 매수한 미국 종목 정보</h2>
 

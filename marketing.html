@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>행복한 일상 - 마케팅 도구</title>
+    <link rel="stylesheet" href="index.css">
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #f1f5f9;
+            font-family: 'Pretendard', sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .glass-panel:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .stock-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(8px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stock-logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #fff;
+            text-decoration: none;
+            background: linear-gradient(135deg, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+            font-size: 1rem;
+        }
+
+        .nav-links a:hover {
+            color: #fff;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: #fff;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+
+        .tool-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .tool-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .tool-desc {
+            color: #cbd5e1;
+            margin-bottom: 20px;
+            height: 60px;
+        }
+
+        .action-btn {
+            display: inline-block;
+            width: 100%;
+            padding: 12px 0;
+            color: #0f172a;
+            font-weight: 700;
+            text-decoration: none;
+            border-radius: 10px;
+            text-align: center;
+            transition: filter 0.2s;
+        }
+
+        .action-btn:hover {
+            filter: brightness(1.1);
+        }
+
+        .btn-google {
+            background: linear-gradient(135deg, #4285F4, #34A853);
+            color: white;
+        }
+
+        .btn-youtube {
+            background: linear-gradient(135deg, #FF0000, #CC0000);
+            color: white;
+        }
+
+        .btn-social {
+            background: linear-gradient(135deg, #B33F40, #D9534F);
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="stock-header">
+        <a href="index.html" class="stock-logo">
+            🚀 M.Tools
+        </a>
+        <nav class="nav-links">
+            <a href="index.html">🏠 홈</a>
+            <a href="stock.html">📈 주식</a>
+            <a href="senior.html">fg 시니어</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h2 class="section-title">유튜브 & 마케팅 필수 분석 도구 📊</h2>
+
+        <div class="tool-grid">
+            <!-- 1. Google Trends -->
+            <div class="glass-panel" style="padding: 30px;">
+                <span class="tool-icon">📈</span>
+                <h3 class="tool-title">구글 트렌드 (YouTube)</h3>
+                <p class="tool-desc">
+                    전 세계 및 국내 사용자들이 유튜브에서 가장 많이 검색하는 키워드를 실시간으로 파악하세요.
+                </p>
+                <a href="https://trends.google.co.kr/trends/explore?gprop=youtube" target="_blank"
+                    class="action-btn btn-google">
+                    실시간 검색어 확인하기 ↗
+                </a>
+            </div>
+
+            <!-- 2. YouTube Trending -->
+            <div class="glass-panel" style="padding: 30px;">
+                <span class="tool-icon">🔥</span>
+                <h3 class="tool-title">유튜브 인기 급상승</h3>
+                <p class="tool-desc">
+                    현재 대한민국에서 가장 인기 있는 동영상과 쇼츠(Shorts) 트렌드를 한눈에 모니터링하세요.
+                </p>
+                <a href="https://www.youtube.com/feed/trending" target="_blank" class="action-btn btn-youtube">
+                    인기 동영상 보러가기 ↗
+                </a>
+            </div>
+
+            <!-- 3. Social Blade -->
+            <div class="glass-panel" style="padding: 30px;">
+                <span class="tool-icon">⚔️</span>
+                <h3 class="tool-title">소셜 블레이드</h3>
+                <p class="tool-desc">
+                    경쟁 채널의 구독자 증가 추이, 예상 수익, 랭킹 등 상세한 데이터를 분석할 수 있습니다.
+                </p>
+                <a href="https://socialblade.com/" target="_blank" class="action-btn btn-social">
+                    채널 분석 하러가기 ↗
+                </a>
+            </div>
+        </div>
+
+        <div class="glass-panel" style="padding: 30px; text-align: center; margin-bottom: 50px;">
+            <h3 style="color: #fff; margin-bottom: 15px;">💡 마케팅 팁</h3>
+            <p style="color: #cbd5e1;">
+                "트렌드는 가장 강력한 콘텐츠 소재입니다. <br>
+                매일 아침 10분, 위 도구들을 활용해 오늘의 핫 키워드를 수집해보세요."
+            </p>
+        </div>
+    </div>
+
+</body>
+
+</html>
