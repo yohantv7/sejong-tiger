@@ -767,23 +767,13 @@ function initDailyLife(prefix) {
     const displayImg1 = document.getElementById(`${prefix}-display-img-1`);
     const displayImg2 = document.getElementById(`${prefix}-display-img-2`);
 
-    // Fallback for single photo mode (Yunu)
-    const displayImg = document.getElementById(`${prefix}-display-img`);
-
-    const displayDesc = document.getElementById(`${prefix}-display-desc`);
-
     // Upload inputs
     const imgUpload1 = document.getElementById(`${prefix}-img-upload-1`);
     const imgUpload2 = document.getElementById(`${prefix}-img-upload-2`);
-    const imgUpload = document.getElementById(`${prefix}-img-upload`); // Single mode upload
 
-    const descEdit = document.getElementById(`${prefix}-desc-edit`);
-    const saveBtn = document.getElementById(`${prefix}-save-daily-btn`);
-
-    // Download buttons
-    const downloadBtn1 = document.getElementById(`${prefix}-download-btn-1`);
-    const downloadBtn2 = document.getElementById(`${prefix}-download-btn-2`);
-    const downloadBtn = document.getElementById(`${prefix}-download-btn`);
+    // Save buttons - VITAL: Must match HTML IDs
+    const saveBtn1 = document.getElementById(`${prefix}-save-btn-1`);
+    const saveBtn2 = document.getElementById(`${prefix}-save-btn-2`);
 
     // Firestore Document Reference: dailyLife/{ryeoeun}
     const docRef = db.collection('dailyLife').doc(prefix);
@@ -793,109 +783,100 @@ function initDailyLife(prefix) {
         if (doc.exists) {
             const data = doc.data();
 
-            // Handle Multiple Images
-            if (displayImg1 && displayImg2) {
-                if (data.image1) displayImg1.src = data.image1;
-                if (data.image2) {
-                    displayImg2.src = data.image2;
-                    displayImg2.style.display = 'block';
-                } else {
-                    displayImg2.style.display = 'none';
-                }
+            // Handle Photo 1
+            if (displayImg1 && data.image1) {
+                displayImg1.src = data.image1;
             }
-            // Handle Single Image
-            else if (displayImg) {
-                if (data.image) displayImg.src = data.image; // Legacy support
-                else if (data.image1) displayImg.src = data.image1; // Fallback if data structure changes
-            }
-
-            if (data.description && displayDesc) displayDesc.textContent = data.description;
-            if (data.description && descEdit) {
-                if (document.activeElement !== descEdit) {
-                    descEdit.value = data.description;
-                }
+            // Handle Photo 2
+            if (displayImg2 && data.image2) {
+                displayImg2.src = data.image2;
             }
         }
     });
 
-    if (saveBtn) {
-        saveBtn.onclick = (e) => {
-            if (e) e.preventDefault();
-            const description = descEdit.value.trim();
+    // Image Compression Helper
+    const compressImage = (base64Str, maxWidth = 800, quality = 0.7) => {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.src = base64Str;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
 
-            const processSave = (img1Data, img2Data) => {
-                const updateData = {
-                    description: description,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                };
-
-                if (img1Data) updateData.image1 = img1Data;
-                if (img2Data) updateData.image2 = img2Data;
-
-                // Legacy single image support
-                if (img1Data && !displayImg1) updateData.image = img1Data;
-
-                docRef.set(updateData, { merge: true })
-                    .then(() => {
-                        alert('저장되었습니다! (모든 기기에 반영됩니다) ✨');
-                        if (imgUpload1) imgUpload1.value = '';
-                        if (imgUpload2) imgUpload2.value = '';
-                        if (imgUpload) imgUpload.value = '';
-                    })
-                    .catch((error) => {
-                        console.error("Error writing document: ", error);
-                        alert("저장 실패: " + error.message);
-                    });
-            };
-
-            const readFile = (file) => {
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = (e) => resolve(e.target.result);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(file);
-                });
-            };
-
-            // Handling uploads
-            const file1 = imgUpload1 ? imgUpload1.files[0] : (imgUpload ? imgUpload.files[0] : null);
-            const file2 = imgUpload2 ? imgUpload2.files[0] : null;
-
-            const promises = [];
-            if (file1) promises.push(readFile(file1)); else promises.push(Promise.resolve(null));
-            if (file2) promises.push(readFile(file2)); else promises.push(Promise.resolve(null));
-
-            Promise.all(promises).then(([img1Res, img2Res]) => {
-                // Size check (simple)
-                if ((img1Res && img1Res.length > 900000) || (img2Res && img2Res.length > 900000)) {
-                    alert("이미지가 너무 큽니다! (1MB 제한) 더 작은 이미지를 사용해주세요.");
-                    return;
+                if (width > maxWidth) {
+                    height *= maxWidth / width;
+                    width = maxWidth;
                 }
-                processSave(img1Res, img2Res);
-            });
-        };
-    }
 
-    const mkDownload = (btn, img) => {
-        if (btn && img) {
+                canvas.width = width;
+                canvas.height = height;
+
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                resolve(canvas.toDataURL('image/jpeg', quality));
+            };
+        });
+    };
+
+    const handleSave = (btn, uploadInput, fieldName, displayElement) => {
+        if (btn && uploadInput) {
             btn.onclick = () => {
-                if (!img.src || img.style.display === 'none') {
-                    alert('다운로드할 이미지가 없습니다.');
+                const file = uploadInput.files[0];
+                if (!file) {
+                    alert("업로드할 사진을 선택해주세요.");
                     return;
                 }
-                const link = document.createElement('a');
-                link.href = img.src;
-                link.download = `${prefix}_daily_${Date.now()}.png`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }
+
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    let result = e.target.result;
+
+                    // Compress if needed (Check initial size approx > 500KB)
+                    if (result.length > 500000) {
+                        try {
+                            // console.log("Compressing image...");
+                            result = await compressImage(result);
+                        } catch (err) {
+                            console.error("Compression failed", err);
+                            alert("이미지 압축 중 오류가 발생했습니다.");
+                            return;
+                        }
+                    }
+
+                    if (result.length > 1048487) { // Still too big?
+                        alert("이미지가 너무 큽니다! 더 작은 이미지를 사용해주세요.");
+                        return;
+                    }
+
+                    // Immediate UI update
+                    if (displayElement) {
+                        displayElement.src = result;
+                    }
+
+                    // Prepare update data for the specific image field
+                    const updateData = {
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                    updateData[fieldName] = result;
+
+                    docRef.set(updateData, { merge: true })
+                        .then(() => {
+                            alert('이미지가 저장되었습니다! (모든 기기에 반영됩니다) ✨');
+                            uploadInput.value = ''; // Clear input
+                        })
+                        .catch((error) => {
+                            console.error("Error writing document: ", error);
+                            alert("이미지 저장 실패: " + error.message);
+                        });
+                };
+                reader.readAsDataURL(file);
+            };
         }
     };
 
-    mkDownload(downloadBtn, displayImg);
-    mkDownload(downloadBtn1, displayImg1);
-    mkDownload(downloadBtn2, displayImg2);
+    handleSave(saveBtn1, imgUpload1, 'image1', displayImg1);
+    handleSave(saveBtn2, imgUpload2, 'image2', displayImg2);
 }
 
 // Visitor Counter Logic
