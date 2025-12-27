@@ -294,15 +294,15 @@ body {
 }
 
 .clock-display {
-    font-size: 6rem;
+    font-size: 3rem;
     font-weight: 700;
     line-height: 1;
     background: linear-gradient(to bottom, #fff, rgba(255, 255, 255, 0.6));
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    letter-spacing: -3px;
-    margin-bottom: 10px;
+    letter-spacing: -1.5px;
+    margin-bottom: 5px;
 }
 
 .greeting-text {
