@@ -109,8 +109,16 @@
                 <div class="todo-section glass-panel bento-card">
                     <h3>오늘의 활동 및 목표 🎯</h3>
                     <div class="input-group">
+                        <!-- Autofill Trap: Invisible inputs to trick browser -->
+                        <div style="width:0; height:0; overflow:hidden; position:absolute;">
+                            <input type="text" name="fake_username_trap" tabindex="-1">
+                            <input type="password" name="fake_password_trap" tabindex="-1">
+                        </div>
+
                         <input type="text" id="daily-goal-input" placeholder="새로운 목표 추가..." aria-label="할 일 입력"
-                            autocomplete="off" name="custom_goal_field">
+                            autocomplete="new-password" name="unique_goal_field_v1" readonly
+                            onfocus="this.removeAttribute('readonly');">
+
                         <div class="time-selector-group" style="display:flex; align-items:center; gap:5px;">
                             <select id="todo-hour" aria-label="시"></select> :
                             <select id="todo-minute" aria-label="분"></select>
