@@ -366,6 +366,7 @@ body {
 }
 
 input[type="text"],
+input[type="email"],
 input[type="time"],
 input[type="password"] {
     background: rgba(0, 0, 0, 0.2);

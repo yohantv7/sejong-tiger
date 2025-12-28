@@ -305,15 +305,14 @@ function renderRequests() {
             try {
                 // Formatting timestamp
                 const d = req.timestamp.toDate ? req.timestamp.toDate() : new Date(req.timestamp);
-                displayDate = `< span style = "font-size:0.7em; color:#aaa; margin-left:8px;" > ${d.getMonth() + 1
-                    } /${d.getDate()}</span > `;
+                displayDate = `<span style="font-size:0.7em; color:#aaa; margin-left:8px;">${d.getMonth() + 1}/${d.getDate()}</span>`;
             } catch (e) { }
         }
 
-        const authorTag = `< small style = "display:inline-block; opacity:0.6; margin-bottom:4px; font-weight:bold;" > ${req.author}</small > `;
+        const authorTag = `<small style="display:inline-block; opacity:0.6; margin-bottom:4px; font-weight:bold;">${req.author}</small>`;
 
         li.innerHTML = `
-    < div style = "display:flex; justify-content:space-between; align-items:flex-start;" >
+    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
         <div>
             ${authorTag} ${displayDate}
             <div style="word-break: break-all;">${req.text}</div>
@@ -321,7 +320,7 @@ function renderRequests() {
                 ${currentUser && (currentUser.username === 'admin' || currentUser.grade === 'admin') ?
                 `<button class="delete-req-btn" style="background:none; border:none; cursor:pointer; font-size:1.1rem; opacity:0.7;">🗑️</button>` : ''
             }
-            </div >
+            </div>
     `;
 
         const delBtn = li.querySelector('.delete-req-btn');
@@ -393,63 +392,52 @@ if (requestInput) {
 }
 
 // Deposit Request Logic
-const openDepositBtn = document.getElementById('open-deposit-modal-btn');
-const depositModal = document.getElementById('deposit-modal');
-const closeDepositModal = document.getElementById('close-deposit-modal');
-const depositSubmitBtn = document.getElementById('deposit-submit-btn');
-const depositNameInput = document.getElementById('deposit-name');
-const depositAmountInput = document.getElementById('deposit-amount');
+// Global function for deposit submission
+window.submitDepositRequest = function () {
+    const depositNameInput = document.getElementById('deposit-name');
+    const depositAmountInput = document.getElementById('deposit-amount');
+    const depositModal = document.getElementById('deposit-modal');
 
-if (openDepositBtn) {
-    openDepositBtn.onclick = () => {
-        if (!currentUser) {
-            alert('로그인이 필요한 기능입니다.');
-            showAuthModal();
-            return;
-        }
-        if (depositModal) depositModal.classList.add('active');
+    if (!depositNameInput || !depositAmountInput) {
+        console.error("Deposit inputs not found");
+        return;
+    }
+
+    const name = depositNameInput.value.trim();
+    const amount = depositAmountInput.value.trim();
+
+    if (!name || !amount) {
+        alert('입금자명과 금액을 모두 입력해주세요.');
+        return;
+    }
+
+    // Create formatted message
+    const message = `[💸 입금 확인 요청]입금자: ${name} / 금액: ${amount}원`;
+
+    // Send to Guestbook
+    const requestObj = {
+        text: message,
+        author: currentUser ? currentUser.username : 'Guest',
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
     };
-}
 
-if (closeDepositModal) {
-    closeDepositModal.onclick = () => {
-        if (depositModal) depositModal.classList.remove('active');
-    };
-}
-
-if (depositSubmitBtn) {
-    depositSubmitBtn.onclick = () => {
-        const name = depositNameInput.value.trim();
-        const amount = depositAmountInput.value.trim();
-
-        if (!name || !amount) {
-            alert('입금자명과 금액을 모두 입력해주세요.');
-            return;
-        }
-
-        // Create formatted message
-        const message = `[💸 입금 확인 요청]입금자: ${name} / 금액: ${amount}원`;
-
-        // Send to Guestbook
-        const requestObj = {
-            text: message,
-            author: currentUser.username,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        };
-
-        db.collection("guestRequests").add(requestObj)
-            .then(() => {
-                alert('요청이 전송되었습니다! 관리자가 확인 후 등급을 변경해드립니다.');
-                if (depositModal) depositModal.classList.remove('active');
-                depositNameInput.value = '';
-                depositAmountInput.value = '';
-            })
-            .catch((error) => {
-                console.error("Error adding document: ", error);
-                alert("전송 실패: " + error.message);
-            });
-    };
-}
+    db.collection("guestRequests").add(requestObj)
+        .then(() => {
+            alert('요청이 전송되었습니다! 관리자가 확인 후 등급을 변경해드립니다.');
+            if (depositModal) {
+                depositModal.classList.remove('active');
+                depositModal.style.display = 'none';
+            }
+            depositNameInput.value = '';
+            depositAmountInput.value = '';
+            // Redirect to homepage to see the request list
+            window.location.href = 'index.html';
+        })
+        .catch((error) => {
+            console.error("Error adding document: ", error);
+            alert("전송 실패: " + error.message);
+        });
+};
 
 const openVideoPopupBtn = document.getElementById('open-video-popup-btn');
 if (openVideoPopupBtn) {
@@ -552,9 +540,9 @@ function updateAuthUI() {
 
         if (requestListContainer) requestListContainer.style.display = 'block';
 
-        // Deposit List (Admin only)
+        // Deposit List (Visible to all for now per user request)
         if (depositListContainer) {
-            depositListContainer.style.display = (currentUser.grade === 'admin') ? 'block' : 'none';
+            depositListContainer.style.display = 'block';
         }
 
         // Lecture Video Access
@@ -567,12 +555,16 @@ function updateAuthUI() {
         }
 
         const userMgmtSection = document.getElementById('user-management-section');
+        const adminLink = document.getElementById('admin-link-container');
+
         if (currentUser.grade === 'admin') {
             if (userMgmtSection) userMgmtSection.style.display = 'block';
+            if (adminLink) adminLink.style.display = 'block';
             adminEditors.forEach(editor => editor.style.display = 'block');
             renderUserList();
         } else {
             if (userMgmtSection) userMgmtSection.style.display = 'none';
+            if (adminLink) adminLink.style.display = 'none';
             adminEditors.forEach(editor => editor.style.display = 'none');
         }
     } else {
@@ -580,7 +572,10 @@ function updateAuthUI() {
         if (authBtn) authBtn.textContent = '로그인';
 
         const userMgmtSection = document.getElementById('user-management-section');
+        const adminLink = document.getElementById('admin-link-container');
+
         if (userMgmtSection) userMgmtSection.style.display = 'none';
+        if (adminLink) adminLink.style.display = 'none';
         adminEditors.forEach(editor => editor.style.display = 'none');
 
         if (videoLockOverlay) videoLockOverlay.style.display = 'flex';
@@ -589,7 +584,9 @@ function updateAuthUI() {
         if (requestInputArea) requestInputArea.style.display = 'none';
         if (requestHint) requestHint.textContent = '로그인 후 요청사항 작성이 가능합니다.';
         if (requestListContainer) requestListContainer.style.display = 'block';
-        if (depositListContainer) depositListContainer.style.display = 'none';
+
+        // Also show deposit list even if not logged in (to see history)
+        if (depositListContainer) depositListContainer.style.display = 'block';
     }
 }
 
@@ -603,6 +600,16 @@ function hideAuthModal() {
     if (emailInput) emailInput.value = '';
     if (usernameInput) usernameInput.value = '';
     if (passwordInput) passwordInput.value = '';
+}
+
+// Password Toggle Logic
+const togglePasswordBtn = document.getElementById('toggle-password');
+if (togglePasswordBtn && passwordInput) {
+    togglePasswordBtn.addEventListener('click', () => {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        togglePasswordBtn.textContent = type === 'password' ? '👁️' : '🚫'; // Change icon
+    });
 }
 
 function setAuthMode(mode) {

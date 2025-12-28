@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>시니어 취업 - 세종호랑이</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="세종호랑이 - 시니어 취업">
+    <meta property="og:description" content="시니어 취업 정보와 재취업 성공 가이드를 확인하세요! 💼">
+    <meta property="og:image" content="http://www.sjtiger.kr/thumbnail.png">
+    <meta property="og:url" content="http://www.sjtiger.kr/senior_job.html">
+
+    <style>
+        /* Senior-friendly styling override */
+        body {
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        p,
+        li {
+            font-size: 1.1rem;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+        }
+
+        .premium-banner {
+            background: linear-gradient(90deg, #1e293b 0%, #0f172a 100%);
+            border: 2px solid #fbbf24;
+            border-radius: 16px;
+            padding: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px -10px rgba(251, 191, 36, 0.3);
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .cta-btn {
+            background: #fbbf24;
+            color: #000;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: transform 0.2s;
+            display: inline-block;
+        }
+
+        .cta-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .partner-logo {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            color: #94a3b8;
+            font-weight: bold;
+            width: 120px;
+            text-align: center;
+        }
+
+        /* Ensure modal styles are present even if index.css fails */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            /* High z-index to ensure visibility */
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1e293b;
+            /* Fallback bg */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            max-width: 90%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="dashboard-header glass-panel flat-header">
+            <div class="header-left">
+                <a href="index.html" class="nav-link-btn"
+                    style="text-decoration: none; color: white; background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 8px;">←
+                    홈으로</a>
+            </div>
+            <div class="header-center" style="flex: 1; text-align: center;">
+                <h2 style="margin: 0; font-size: 1.6rem;">내 일자리 찾기 & 정보 수정 💼</h2>
+            </div>
+            <div class="header-right" style="width: 100px;"></div>
+        </header>
+
+        <div class="container" style="padding: 20px; max-width: 1200px; margin: 0 auto; padding-top: 100px;">
+
+            <!-- Revenue Section: Premium Service for Seniors -->
+            <div class="premium-banner">
+                <div>
+                    <span
+                        style="background: #fbbf24; color: black; padding: 5px 10px; border-radius: 20px; font-size: 0.9rem; font-weight: bold;">PREMIUM</span>
+                    <h2 style="color: white; margin: 10px 0;">⭐ 더 빠른 취업을 원하시나요?</h2>
+                    <p style="color: #cbd5e1; margin: 0;">프리미엄 회원이 되시면, <strong style="color:#fbbf24">인증 마크 부착</strong>
+                        및 <strong style="color:#fbbf24">기업 우선 추천</strong> 혜택을 드립니다.</p>
+                </div>
+                <a href="#" onclick="document.getElementById('benefits-modal').style.display='flex'; return false;"
+                    class="cta-btn">내 정보 수정하고 혜택받기 ↗</a>
+            </div>
+
+            <!-- Tabs (Visual Only for now) -->
+            <div style="display:flex; gap:10px; margin-bottom: 30px;">
+                <button
+                    style="flex:1; padding:15px; background:#3b82f6; border:none; border-radius:10px; color:white; font-size:1.2rem; font-weight:bold;">🧑‍🦳
+                    일자리 찾기 (구직자)</button>
+                <button
+                    style="flex:1; padding:15px; background:rgba(255,255,255,0.1); border:none; border-radius:10px; color:#cbd5e1; font-size:1.2rem; font-weight:bold;"
+                    onclick="alert('기업 회원 전용 페이지로 이동합니다.')">🏢 인재 찾기 (기업)</button>
+            </div>
+
+            <!-- Section 1: Job Search Channels -->
+            <h2 class="section-title"
+                style="border-left: 5px solid #60a5fa; padding-left: 15px; margin-bottom: 25px; color:white;">
+                맞춤형 일자리 찾기 🔍</h2>
+            <div class="affiliate-grid"
+                style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; margin-bottom: 50px;">
+
+                <!-- 1. Government Jobs -->
+                <div class="product-card glass-panel" style="padding: 25px; border: 1px solid rgba(96, 165, 250, 0.3);">
+                    <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                        <div style="font-size: 2.5rem; margin-right: 15px;">🏛️</div>
+                        <h3 style="color: #fff; margin: 0; font-size: 1.4rem;">공공기관/지자체 일자리</h3>
+                    </div>
+                    <ul style="color: #cbd5e1; line-height: 1.7; padding-left: 20px; list-style-type: disc;">
+                        <li><strong>노인일자리사업</strong>: 만 65세 이상 (공익활동 등)</li>
+                        <li><strong>시니어인턴십</strong>: 기업 인턴십 (채용 장려금)</li>
+                        <li><strong>신뢰도 100%</strong>: 정부가 보증하는 안전한 일자리</li>
+                    </ul>
+                    <a href="https://www.work.go.kr" target="_blank" class="buy-btn"
+                        style="margin-top: 15px; display: inline-block; width: auto; padding: 10px 20px; background: #60a5fa; color: #fff; font-weight: bold; border: none; font-size:1.1rem;">
+                        워크넷 바로가기 ↗
+                    </a>
+                </div>
+
+                <!-- 2. Private Support -->
+                <div class="product-card glass-panel" style="padding: 25px; border: 1px solid rgba(96, 165, 250, 0.3);">
+                    <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                        <div style="font-size: 2.5rem; margin-right: 15px;">🏢</div>
+                        <h3 style="color: #fff; margin: 0; font-size: 1.4rem;">기업/민간 채용공고</h3>
+                    </div>
+                    <ul style="color: #cbd5e1; line-height: 1.7; padding-left: 20px; list-style-type: disc;">
+                        <li><strong>중장년내일센터</strong>: 40세 이상 전직지원</li>
+                        <li><strong>기업 상시채용</strong>: 경비, 미화, 운전직 등</li>
+                        <li><strong>기술교육 무료</strong>: 폴리텍대학 연계 교육</li>
+                    </ul>
+                    <a href="https://www.4060job.or.kr" target="_blank" class="buy-btn"
+                        style="margin-top: 15px; display: inline-block; width: auto; padding: 10px 20px; background: #60a5fa; color: #fff; font-weight: bold; border: none; font-size:1.1rem;">
+                        중장년내일센터 ↗
+                    </a>
+                </div>
+            </div>
+
+            <!-- Revenue Section: For Employers -->
+            <div style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 30px; margin-bottom: 50px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px;">
+                    <div>
+                        <h2 style="color:white; margin-top:0;">🤝 기업 회원이신가요?</h2>
+                        <p style="color:#cbd5e1; margin-bottom:0;">검증된 시니어 인재를 추천해 드립니다. <br>사업자 인증 후 신뢰할 수 있는 채용을
+                            시작하세요.</p>
+                    </div>
+                    <a href="#" class="cta-btn" style="background:transparent; border:2px solid #fff; color:white;">기업
+                        서비스 안내 ></a>
+                </div>
+                <!-- Logos -->
+                <div style="display:flex; gap:15px; margin-top:20px; overflow-x:auto;">
+                    <div class="partner-logo">삼성전자</div>
+                    <div class="partner-logo">현대자동차</div>
+                    <div class="partner-logo">LG전자</div>
+                    <div class="partner-logo">SK텔레콤</div>
+                    <div class="partner-logo">롯데호텔</div>
+                </div>
+            </div>
+
+            <!-- Section 2: Popular Jobs -->
+            <h2 class="section-title"
+                style="border-left: 5px solid #fbbf24; padding-left: 15px; margin-bottom: 25px; color:white;">
+                시니어 인기 직종 베스트 5 ⭐</h2>
+            <div class="affiliate-grid"
+                style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 50px;">
+                <!-- Cards (Same content, styling inherited) -->
+                <div class="product-card glass-panel" style="padding: 20px;">
+                    <div style="font-size: 2rem; margin-bottom: 10px;">🛡️</div>
+                    <h4 style="color: #fff; margin: 0;">경비/보안</h4>
+                </div>
+                <div class="product-card glass-panel" style="padding: 20px;">
+                    <div style="font-size: 2rem; margin-bottom: 10px;">🧹</div>
+                    <h4 style="color: #fff; margin: 0;">미화/청소</h4>
+                </div>
+                <div class="product-card glass-panel" style="padding: 20px;">
+                    <div style="font-size: 2rem; margin-bottom: 10px;">🚚</div>
+                    <h4 style="color: #fff; margin: 0;">운전/배송</h4>
+                </div>
+                <div class="product-card glass-panel" style="padding: 20px;">
+                    <div style="font-size: 2rem; margin-bottom: 10px;">👵</div>
+                    <h4 style="color: #fff; margin: 0;">요양보호사</h4>
+                </div>
+                <div class="product-card glass-panel" style="padding: 20px;">
+                    <div style="font-size: 2rem; margin-bottom: 10px;">📗</div>
+                    <h4 style="color: #fff; margin: 0;">사회활동가</h4>
+                </div>
+            </div>
+
+            <!-- Footer Info -->
+            <p style="text-align: center; color: #94a3b8; margin-top: 50px;">
+                제휴 및 광고 문의: 02-1234-5678 (운영팀)<br>
+                © 2025 세종호랑이 시니어 취업 정보. All rights reserved.
+            </p>
+        </div>
+    </div>
+    <!-- Benefits Info Modal -->
+    <div id="benefits-modal" class="modal-overlay">
+        <div class="modal-content glass-panel" style="width: 500px; text-align: left;">
+            <div class="modal-header">
+                <h3>✨ 회원 등급별 혜택 안내</h3>
+                <button type="button" class="close-btn"
+                    onclick="document.getElementById('benefits-modal').style.display='none'">&times;</button>
+            </div>
+            <div style="margin-top: 15px; color: #e2e8f0; line-height: 1.6;">
+                <div
+                    style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 10px;">
+                    <div style="font-weight: bold; color: #94a3b8; margin-bottom: 5px;">A 등급 (일반 회원)</div>
+                    <ul style="font-size: 0.9rem; padding-left: 20px; list-style-type: disc;">
+                        <li>기본 구인정보 조회</li>
+                        <li>커뮤니티 글 읽기 가능</li>
+                    </ul>
+                </div>
+                <div
+                    style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); padding: 15px; border-radius: 12px; margin-bottom: 10px;">
+                    <div style="font-weight: bold; color: #3b82f6; margin-bottom: 5px;">B 등급 (우수 회원)</div>
+                    <ul style="font-size: 0.9rem; padding-left: 20px; list-style-type: disc;">
+                        <li><strong>이력서 등록 및 지원 가능</strong></li>
+                        <li>관심 기업 알림 서비스</li>
+                        <li>프리미엄 배지 부여</li>
+                        <li style="color: #fbbf24; font-weight: bold; margin-top: 5px;">회비 : 월 만원</li>
+                    </ul>
+                </div>
+                <div
+                    style="background: rgba(251, 191, 36, 0.1); border: 1px solid rgba(251, 191, 36, 0.3); padding: 15px; border-radius: 12px;">
+                    <div style="font-weight: bold; color: #fbbf24; margin-bottom: 5px;">C 등급 (VIP 회원)</div>
+                    <ul style="font-size: 0.9rem; padding-left: 20px; list-style-type: disc;">
+                        <li><strong>헤드헌터 전담 매칭 서비스</strong></li>
+                        <li>기업 인사담당자 직접 연결</li>
+                        <li>VIP 전용 라운지 이용</li>
+                        <li style="color: #fbbf24; font-weight: bold; margin-top: 5px;">회비 : 연 10만원</li>
+                    </ul>
+                </div>
+                <div style="margin-top: 20px; text-align: center;">
+                    <button class="cta-btn" onclick="document.getElementById('deposit-info-modal').style.display='flex'"
+                        style="font-size: 1rem; padding: 10px 30px; background: #64748b; color: white; margin-right: 10px;">
+                        입금 안내
+                    </button>
+                    <button class="cta-btn" onclick="location.href='index.html'"
+                        style="font-size: 1rem; padding: 10px 30px;">
+                        로그인하여 등급 확인하기
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deposit Info Modal -->
+    <div id="deposit-info-modal" class="modal-overlay" style="z-index: 2100;">
+        <div class="modal-content glass-panel" style="width: 400px; text-align: center;">
+            <div class="modal-header">
+                <h3>💸 회비 입금 안내</h3>
+                <button type="button" class="close-btn"
+                    onclick="document.getElementById('deposit-info-modal').style.display='none'">&times;</button>
+            </div>
+            <div style="margin-top: 20px; color: #e2e8f0; line-height: 1.6;">
+                <p>아래 계좌로 회비를 입금해주시면<br>확인 후 등급이 조정됩니다.</p>
+
+                <div
+                    style="background: rgba(251, 191, 36, 0.1); border: 2px solid #fbbf24; padding: 20px; border-radius: 12px; margin: 20px 0;">
+                    <div style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 5px;">국민은행</div>
+                    <div style="font-size: 1.5rem; font-weight: bold; color: #fbbf24; letter-spacing: 1px;">
+                        803502-00-002609</div>
+                    <div style="color: #cbd5e1; margin-top: 5px;">예금주: 한규호</div>
+                </div>
+
+                <p style="font-size: 0.9rem; color: #94a3b8;">
+                    * 입금자명과 회원가입 이름이 같아야 처리가 빠릅니다.<br>
+                    * 입금 후 '입금 확인 요청'을 남겨주세요.
+                </p>
+
+                <button class="cta-btn"
+                    onclick="document.getElementById('deposit-info-modal').style.display='none'; document.getElementById('deposit-modal').style.display='flex';"
+                    style="margin-top: 20px; font-size: 1rem;">
+                    입금 확인 요청(등급UP)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deposit Request Modal (Copied from index.html to share script.js logic) -->
+    <div id="deposit-modal" class="modal-overlay" style="z-index: 2200;">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h3>💸 입금 확인 요청</h3>
+                <button type="button" class="close-btn"
+                    onclick="document.getElementById('deposit-modal').style.display='none'">&times;</button>
+            </div>
+            <div class="auth-form" style="display: flex; flex-direction: column; gap: 10px;">
+                <input type="text" id="deposit-name" placeholder="입금자명 (예: 홍길동)"
+                    style="height: 50px; box-sizing: border-box;">
+                <select id="deposit-amount"
+                    style="height: 50px; box-sizing: border-box; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; padding: 0 10px;">
+                    <option value="" disabled selected>입금 금액 선택</option>
+                    <option value="10,000">1만원 (B등급 - 우수회원)</option>
+                    <option value="100,000">10만원 (C등급 - VIP회원)</option>
+                </select>
+                <button id="deposit-submit-btn" style="height: 50px; margin-top: 0;" onclick="submitDepositRequest()">요청
+                    보내기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK (Re-injected for stability) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <script src="script.js"></script>
+    <script>
+        // Inline simple logic for this specific page modal if script.js logic is complex or centralized
+        const benefitsModal = document.getElementById('benefits-modal');
+        const closeBenefitsBtn = document.getElementById('close-benefits-modal');
+
+        const depositInfoModal = document.getElementById('deposit-info-modal');
+        const closeDepositInfoBtn = document.getElementById('close-deposit-info-modal');
+
+        const depositModal = document.getElementById('deposit-modal');
+        const closeDepositBtn = document.getElementById('close-deposit-modal');
+
+        // Robust Inline Submission Logic
+        window.submitDepositRequest = function () {
+            // Debugging alert
+            console.log("Submit function triggered");
+
+            const depositNameInput = document.getElementById('deposit-name');
+            const depositAmountInput = document.getElementById('deposit-amount');
+            const depositModal = document.getElementById('deposit-modal');
+
+            if (!depositNameInput || !depositAmountInput) {
+                alert("오류: 입력창을 찾을 수 없습니다.");
+                return;
+            }
+
+            const name = depositNameInput.value.trim();
+            const amount = depositAmountInput.value.trim();
+
+            if (!name || !amount) {
+                alert('입금자명과 금액을 모두 입력해주세요.');
+                return;
+            }
+
+            if (typeof firebase === 'undefined') {
+                alert("Firebase가 로드되지 않았습니다. 잠시만 기다렸다가 다시 시도해주세요.");
+                return;
+            }
+
+            if (!firebase.apps.length) {
+                const firebaseConfig = {
+                    apiKey: "AIzaSyAZhCOrlVWiTj-xuYprTciXlUbxnFeSE9E",
+                    authDomain: "my-home-74cf5.firebaseapp.com",
+                    projectId: "my-home-74cf5",
+                    storageBucket: "my-home-74cf5.firebasestorage.app",
+                    messagingSenderId: "7963220432",
+                    appId: "1:7963220432:web:1541c1437b859e8023c1d5"
+                };
+                firebase.initializeApp(firebaseConfig);
+            }
+
+            const firestore = firebase.firestore();
+            const user = firebase.auth().currentUser;
+            const author = user ? user.displayName || user.email : '비회원/게스트';
+
+            // Create formatted message
+            const message = `[💸 입금 확인 요청]입금자: ${name} / 금액: ${amount}원`;
+
+            // Send to Guestbook
+            const requestObj = {
+                text: message,
+                author: author,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            firestore.collection("guestRequests").add(requestObj)
+                .then(() => {
+                    alert('요청이 전송되었습니다! 관리자가 확인 후 등급을 변경해드립니다.');
+                    if (depositModal) {
+                        depositModal.style.display = 'none';
+                    }
+                    depositNameInput.value = '';
+                    depositAmountInput.value = '';
+                    // Redirect to homepage
+                    window.location.href = 'index.html';
+                })
+                .catch((error) => {
+                    console.error("Error adding document: ", error);
+                    alert("전송 실패: " + error.message);
+                });
+        }
+
+
+        // Function to open modal (Global scope to call from onclick)
+        window.openBenefitsModal = function () {
+            // alert('Debug: Opening Benefits Modal'); // Uncomment for debugging
+            if (benefitsModal) {
+                benefitsModal.classList.add('active');
+            } else {
+                console.error('Benefits modal element not found');
+            }
+        }
+
+        window.openDepositInfoModal = function () {
+            if (depositInfoModal) depositInfoModal.classList.add('active');
+        }
+
+        if (closeBenefitsBtn) {
+            closeBenefitsBtn.onclick = () => {
+                if (benefitsModal) benefitsModal.classList.remove('active');
+            }
+        }
+
+        if (closeDepositInfoBtn) {
+            closeDepositInfoBtn.onclick = () => {
+                if (depositInfoModal) depositInfoModal.classList.remove('active');
+            }
+        }
+
+        if (closeDepositBtn) {
+            closeDepositBtn.onclick = () => {
+                if (depositModal) depositModal.classList.remove('active');
+            }
+        }
+
+        // Close on clicking outside
+        window.onclick = (e) => {
+            if (e.target === benefitsModal) benefitsModal.classList.remove('active');
+            if (e.target === depositInfoModal) depositInfoModal.classList.remove('active');
+            if (e.target === depositModal) depositModal.classList.remove('active');
+        }
+    </script>
+</body>
+
+</html>
