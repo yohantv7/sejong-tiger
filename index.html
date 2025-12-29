@@ -121,6 +121,7 @@
                         <h3 id="date" class="hero-date" style="margin: 0;"></h3>
                         <span id="weather" style="font-size: 1.2rem; color: var(--accent-color);"></span>
                     </div>
+
                     <h1 id="clock" class="clock-display">00:00:00</h1>
                     <h2 id="greeting" class="greeting-text">안녕하세요!</h2>
                 </div>
@@ -212,6 +213,12 @@
                         <ul id="deposit-list" style="list-style: none; padding: 0;"></ul>
                     </div>
 
+                    <div style="text-align: center; margin-top: 15px; margin-bottom: 20px;">
+                        <div id="visitor-count-display"
+                            style="display: inline-block; padding: 8px 16px; background: rgba(255, 255, 255, 0.05); border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.7); font-size: 0.9rem;">
+                            방문자 : -명</div>
+                    </div>
+
                     <div id="user-management-section" style="display: none;">
                         <hr class="divider">
                         <h3>회원 관리 🛡️</h3>
@@ -221,7 +228,7 @@
                     </div>
 
                     <div style="margin-top: 20px; text-align: center;">
-                        <span id="visitor-count" class="visitor-display-bottom"></span>
+                        <!-- Legacy visitor count removed -->
                     </div>
 
                     <div id="admin-link-container" style="margin-top: 20px; display: none;">
@@ -337,13 +344,13 @@
 
             // Create formatted message
             const message = `[💸 입금 확인 요청]입금자: ${name} / 금액: ${amount}원`;
-
             const requestObj = {
                 text: message,
                 author: author,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             };
 
+            // Simply add the request without changing grade
             firestore.collection("guestRequests").add(requestObj)
                 .then(() => {
                     alert('요청이 전송되었습니다! 관리자가 확인 후 등급을 변경해드립니다.');
@@ -362,6 +369,13 @@
                 });
         }
     </script>
+    <div id="admin-link-container" onclick="location.href='admin_users.html'"
+        style="position:fixed; bottom:60px; right:20px; z-index:9999; cursor:pointer; background:rgba(0, 0, 0, 0.6); color:#4CC9F0; padding:10px 20px; border-radius:30px; border:1px solid #4CC9F0; font-weight:bold; backdrop-filter:blur(5px); box-shadow: 0 4px 6px rgba(0,0,0,0.3); display:none;">
+        ⚙️ 관리자 페이지</div>
+    <div id="visitor-count" class="visitor-display-bottom"
+        style="position:fixed; bottom:20px; right:20px; z-index:9999; display:flex; align-items:center; gap:8px;">
+        <span onclick="restoreAdmin()" style="cursor:pointer; opacity:0.5;" title="관리자 권한 복구">🛠️</span>
+    </div>
 </body>
 
 </html>

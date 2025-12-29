@@ -388,7 +388,7 @@
                         <div class="kpi-trend trend-up">실시간 집계 중</div>
                     </div>
                     <div class="kpi-card">
-                        <div class="kpi-title">활성 사용자 (Active)</div>
+                        <div class="kpi-title">누적 방문/접속 (Total Visits)</div>
                         <div class="kpi-value" id="kpi-active">-</div>
                         <div class="kpi-trend trend-up">정상 이용 회원</div>
                     </div>
@@ -432,8 +432,6 @@
                     </div>
                     <div class="filter-group">
                         <button class="btn btn-success" onclick="exportExcel()">📥 엑셀 다운로드</button>
-                        <button class="btn btn-primary" onclick="alert('선택한 회원에게 문자(SMS) 발송 팝업을 엽니다.')">📨 문자
-                            발송</button>
                     </div>
                 </div>
 
@@ -441,7 +439,7 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th style="width:40px"><input type="checkbox"></th>
+                                <!-- Removed Checkbox Column -->
                                 <th>회원정보 (ID)</th>
                                 <th>등급</th>
                                 <th>가입일 / 최근접속</th>
@@ -629,7 +627,7 @@
                         email: data.email || '-',
                         grade: data.grade || 'A', // Default to A (General)
                         joinDate: formatTimestamp(data.createdAt || data.joinDate), // Use createdAt with fallback
-                        lastLogin: '최근 활동 없음', // Mock for now
+                        lastLogin: data.lastLogin || null, // Pass Raw Timestamp/Date or null
                         status: 'Active',
                         points: data.points || 0,
                         course: data.course || '' // Fetch course
@@ -668,18 +666,14 @@
 
         // --- DASHBOARD UPDATES ---
         function updateDashboardStats() {
-            // Calculate Stats
+            // Calculate Stats (Sync)
             const total = users.length;
-            const active = users.filter(u => u.status === 'Active').length;
             const edu = users.filter(u => u.course).length;
-            const issue = users.filter(u => u.status !== 'Active').length; // Suspended/Etc
+            const issue = users.filter(u => u.status !== 'Active').length;
 
-            // Update DOM with animation (simple text update)
+            // Update DOM (Sync)
             const kpiTotal = document.getElementById('kpi-total');
             if (kpiTotal) kpiTotal.textContent = total.toLocaleString() + "명";
-
-            const kpiActive = document.getElementById('kpi-active');
-            if (kpiActive) kpiActive.textContent = active.toLocaleString() + "명";
 
             const kpiEdu = document.getElementById('kpi-edu');
             if (kpiEdu) kpiEdu.textContent = edu.toLocaleString() + "명";
@@ -865,7 +859,7 @@
 
                 return `
                 <tr>
-                    <td><input type="checkbox"></td>
+                    <!-- Removed Checkbox Cell -->
                     <td>
                         <div style="font-weight:bold; color:white;">${u.name}</div>
                         <div style="font-size:0.8rem; color:#64748b;">${u.email}</div>
@@ -955,8 +949,67 @@
         window.openModal = (uid) => {
             const u = users.find(x => x.uid === uid);
             if (!u) return;
-            document.getElementById('m-name').textContent = u.name;
-            document.getElementById('m-email').textContent = u.email;
+
+            // Basic Info
+            document.getElementById('m-name').innerText = u.name;
+            document.getElementById('m-email').innerText = u.email;
+
+            // Extended Info (with fallbacks if data not in DB)
+            const phone = u.phone || '010-0000-0000 (미등록)';
+            const address = u.address || '주소 정보 없음';
+            const course = u.course || '수강 내역 없음';
+            const matchedStats = u.matchedStats || '구직 활동 내역 없음';
+
+            // We need to target the elements by ID. 
+            // Note: The original HTML (lines 521-563) hardcoded these values without IDs for some. 
+            // I will assume simple ID assignment or text replacement if IDs exist.
+            // Let's inject logic to update them if we add IDs to the HTML below, 
+            // OR I will simply update the IDs in the HTML first.
+            // Since I am only replacing this script block, I should probably use querySelector or assume the HTML is updated.
+            // Wait, I can only replace specific blocks. I should update the HTML IDs first? 
+            // Actually, in the HTML (lines 531-540), only m-name and m-email had IDs.
+            // I will update the HTML + Script together or assume I need to handle it.
+            // To be safe, I'll update the innerHTML of the modal content directly here since IDs are missing.
+
+            // Updating modal content dynamically
+            const modalBody = document.querySelector('#user-modal .modal-card > div:nth-child(2)');
+            if (modalBody) {
+                modalBody.innerHTML = `
+                <div style="display:flex; gap:20px; margin-bottom:20px;">
+                    <div style="flex:1; background:rgba(0,0,0,0.2); padding:15px; border-radius:10px;">
+                        <h4 style="color:var(--accent-color); margin-top:0;">👤 기본 정보</h4>
+                        <p style="color:#cbd5e1; margin:5px 0;"><strong>이름:</strong> ${u.name}</p>
+                        <p style="color:#cbd5e1; margin:5px 0;"><strong>연락처:</strong> ${phone}</p>
+                        <p style="color:#cbd5e1; margin:5px 0;"><strong>이메일:</strong> ${u.email}</p>
+                        <p style="color:#cbd5e1; margin:5px 0;"><strong>주소:</strong> ${address}</p>
+                        <p style="color:#cbd5e1; margin:5px 0;"><strong>가입일:</strong> ${u.joinDate}</p>
+                    </div>
+                    <div style="flex:1; background:rgba(0,0,0,0.2); padding:15px; border-radius:10px;">
+                        <h4 style="color:#a855f7; margin-top:0;">🎓 학습/활동 정보</h4>
+                        <p style="color:#cbd5e1; margin:5px 0;"><strong>등급:</strong> ${u.grade}등급</p>
+                        <p style="color:#cbd5e1; margin:5px 0;"><strong>보유 포인트:</strong> ${u.points.toLocaleString()} P</p>
+                        <p style="color:#cbd5e1; margin:5px 0;"><strong>수강 강좌:</strong> ${course}</p>
+                        <p style="color:#cbd5e1; margin:5px 0;"><strong>매칭 상태:</strong> ${matchedStats}</p>
+                        <div style="margin-top:10px;">
+                            <button class="btn btn-primary" onclick="alert('이력서를 PDF로 생성합니다 (데모).')"
+                                style="font-size:0.8rem;">🖨️ 이력서 출력</button>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 style="color:white; border-top:1px solid var(--border-glass); padding-top:15px;">📝 관리자 상담 로그</h4>
+                <div style="background:rgba(0,0,0,0.3); height:150px; overflow-y:auto; padding:10px; border-radius:8px; margin-bottom:15px; color:#94a3b8; font-size:0.9rem;">
+                    <div style="border-bottom:1px solid rgba(255,255,255,0.05); padding:5px;">[시스템] 데이터 조회 완료 (${new Date().toLocaleDateString()})</div>
+                    <div style="border-bottom:1px solid rgba(255,255,255,0.05); padding:5px;">[기록] 최근 접속일: ${u.lastLogin || '기록 없음'}</div>
+                </div>
+
+                <div style="display:flex; justify-content:flex-end; gap:10px;">
+                     <button class="btn btn-danger" onclick="deleteUser('${u.uid}'); closeModal()">🚫 회원 삭제</button>
+                    <button class="btn btn-primary" onclick="closeModal()">닫기</button>
+                </div>
+                `;
+            }
+
             document.getElementById('user-modal').classList.add('active');
         };
         window.closeModal = () => document.getElementById('user-modal').classList.remove('active');
@@ -980,5 +1033,6 @@
         });
 
     </script>
+
+    <!-- SMS Modal and scripts removed as per request -->
 </body>
-```

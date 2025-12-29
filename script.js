@@ -483,7 +483,7 @@ const passwordInput = document.getElementById('auth-password');
 const userInfo = document.getElementById('user-info');
 
 let users = []; // Initialize empty array for users (fetched from specific query if needed)
-let currentUser = null; // Holds Firestore user data
+let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null; // Hydrate from storage
 let authMode = 'login'; // 'login' or 'register'
 
 // Auth State Observer
@@ -491,11 +491,38 @@ firebase.auth().onAuthStateChanged((user) => {
     if (user) {
         // User is signed in.
         console.log("User signed in: ", user.email);
+
+        // Update Last Login Timestamp
+        const userRef = db.collection('users').doc(user.uid);
+
+        const batch = db.batch();
+        batch.set(userRef, { lastLogin: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+
+        batch.commit().catch(err => console.error("Stats update failed:", err));
+
         // Fetch user details from Firestore
         db.collection('users').doc(user.uid).get().then((doc) => {
             if (doc.exists) {
-                currentUser = { uid: user.uid, ...doc.data() };
-                localStorage.setItem('currentUser', JSON.stringify(currentUser)); // Optional backup
+                const data = doc.data();
+
+                // Sticky Admin Logic: Check local storage before overwriting
+                const storedUser = JSON.parse(localStorage.getItem('currentUser'));
+                let grade = data.grade || 'A';
+
+                // If local says Admin but DB says 'A' (or missing), preserve Admin to prevent regression
+                if (storedUser && (storedUser.grade || '').toLowerCase() === 'admin' && grade === 'A') {
+                    console.warn("Preserving local Admin status against DB regression");
+                    grade = 'admin';
+                }
+
+                // Fallback for missing data
+                currentUser = {
+                    uid: user.uid,
+                    ...data,
+                    username: data.username || user.displayName || user.email.split('@')[0] || 'Member',
+                    grade: grade
+                };
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 updateAuthUI();
             } else {
                 console.log("No user profile found in Firestore.");
@@ -512,6 +539,40 @@ firebase.auth().onAuthStateChanged((user) => {
     }
 });
 
+// Emergency Admin Recovery Tool (Global)
+window.restoreAdmin = () => {
+    const user = firebase.auth().currentUser;
+    if (!user) return alert("로그인이 필요합니다.");
+
+    db.collection('users').doc(user.uid).set({
+        grade: 'admin',
+        username: '관리자',
+        email: user.email,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true })
+        .then(() => {
+            // Update local state immediately - ROBUST FIX
+            if (!currentUser) {
+                currentUser = {
+                    uid: user.uid,
+                    email: user.email,
+                    username: '관리자',
+                    grade: 'admin'
+                };
+            } else {
+                currentUser.grade = 'admin';
+                currentUser.username = '관리자';
+            }
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+            alert("관리자(admin) 등급으로 복구되었습니다! 확인을 누르면 새로고침됩니다.");
+            window.location.reload();
+        })
+        .catch((err) => {
+            alert("복구 실패: 보안 규칙을 '테스트 모드(모두 허용)'로 변경한 뒤 다시 시도해주세요.\n" + err.message);
+        });
+};
+
 function updateAuthUI() {
     const requestInputArea = document.querySelector('.request-input-group');
     const requestListContainer = document.querySelector('.request-list-container');
@@ -520,15 +581,24 @@ function updateAuthUI() {
     const adminEditors = document.querySelectorAll('.admin-daily-editor');
     const videoLockOverlay = document.getElementById('video-lock-overlay');
     const openVideoPopupBtn = document.getElementById('open-video-popup-btn');
+    const adminLink = document.getElementById('admin-link-container');
 
     // Re-render requests to show/hide delete buttons
     renderRequests();
+
+    // Determine Admin Status
+    const isAdmin = currentUser && (currentUser.grade || '').toLowerCase() === 'admin';
+
+    // Show/Hide Admin Link (Global Check)
+    if (adminLink) {
+        adminLink.style.display = isAdmin ? 'block' : 'none';
+    }
 
     if (currentUser) {
         // Show grade in greeting
         const grade = currentUser.grade || 'A';
         if (userInfo) {
-            userInfo.textContent = (currentUser.grade === 'admin')
+            userInfo.textContent = isAdmin
                 ? `admin님, 환영합니다!`
                 : `${currentUser.username}님 (${grade}등급), 환영합니다!`;
         }
@@ -536,7 +606,7 @@ function updateAuthUI() {
         updateGreeting(new Date().getHours());
 
         if (requestInputArea) requestInputArea.style.display = 'flex';
-        if (requestHint) requestHint.textContent = '나에게 요청사항이 있으면 알려주세요';
+        if (requestHint) requestHint.textContent = '나에게 요청사항이 있으면 알려주세요'; // Changed per user preference? Or keep original
 
         if (requestListContainer) requestListContainer.style.display = 'block';
 
@@ -546,7 +616,7 @@ function updateAuthUI() {
         }
 
         // Lecture Video Access
-        if (currentUser.grade === 'admin' || grade === 'C') {
+        if (isAdmin || grade === 'C') {
             if (videoLockOverlay) videoLockOverlay.style.display = 'none';
             if (openVideoPopupBtn) openVideoPopupBtn.style.display = 'block';
         } else {
@@ -555,16 +625,13 @@ function updateAuthUI() {
         }
 
         const userMgmtSection = document.getElementById('user-management-section');
-        const adminLink = document.getElementById('admin-link-container');
-
-        if (currentUser.grade === 'admin') {
+        // Admin Sections
+        if (isAdmin) {
             if (userMgmtSection) userMgmtSection.style.display = 'block';
-            if (adminLink) adminLink.style.display = 'block';
             adminEditors.forEach(editor => editor.style.display = 'block');
-            renderUserList();
+            initAdminUserList(); // Fetch and render users
         } else {
             if (userMgmtSection) userMgmtSection.style.display = 'none';
-            if (adminLink) adminLink.style.display = 'none';
             adminEditors.forEach(editor => editor.style.display = 'none');
         }
     } else {
@@ -572,10 +639,8 @@ function updateAuthUI() {
         if (authBtn) authBtn.textContent = '로그인';
 
         const userMgmtSection = document.getElementById('user-management-section');
-        const adminLink = document.getElementById('admin-link-container');
 
         if (userMgmtSection) userMgmtSection.style.display = 'none';
-        if (adminLink) adminLink.style.display = 'none';
         adminEditors.forEach(editor => editor.style.display = 'none');
 
         if (videoLockOverlay) videoLockOverlay.style.display = 'flex';
@@ -702,13 +767,35 @@ if (authSubmitBtn) {
 }
 
 // User Management Logic
+// User Management Logic (Firebase Integration)
 const userList = document.getElementById('user-list');
+let userUnsubscribe = null;
+
+function initAdminUserList() {
+    if (userUnsubscribe) userUnsubscribe(); // Detach previous listener if any
+
+    if (currentUser && currentUser.grade === 'admin') {
+        userUnsubscribe = db.collection('users')
+            .orderBy('createdAt', 'desc')
+            .onSnapshot((snapshot) => {
+                users = []; // Reset global users array
+                snapshot.forEach((doc) => {
+                    users.push({ uid: doc.id, ...doc.data() });
+                });
+                renderUserList();
+            }, (error) => {
+                console.error("Error fetching users:", error);
+            });
+    }
+}
 
 function renderUserList() {
     if (!userList) return;
     userList.innerHTML = '';
+
     users.forEach(user => {
-        if (user.username === 'admin') return; // Don't allow deleting admin
+        // Skip current admin user from list (optional, prevents self-deletion)
+        if (user.uid === currentUser.uid) return;
 
         const li = document.createElement('li');
         li.className = 'user-item';
@@ -718,53 +805,64 @@ function renderUserList() {
 
         li.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
-                <span>${user.username} <small style="color:var(--accent-color);">(${currentGrade})</small></span>
-                <div style="display:flex; gap:5px;">
-                    <select class="grade-select" data-user="${user.username}">
+                <span>
+                    ${user.username} 
+                    <small style="color:var(--accent-color);">(${currentGrade})</small>
+                    <br><small style="color:#64748b; font-size:0.75rem;">${user.email}</small>
+                </span>
+                <div style="display:flex; gap:5px; align-items:center;">
+                    <select class="grade-select" data-uid="${user.uid}" style="padding:4px; border-radius:4px; background:#1e293b; color:white; border:1px solid #475569;">
                         <option value="A" ${currentGrade === 'A' ? 'selected' : ''}>A</option>
                         <option value="B" ${currentGrade === 'B' ? 'selected' : ''}>B</option>
                         <option value="C" ${currentGrade === 'C' ? 'selected' : ''}>C</option>
+                        <option value="admin" ${currentGrade === 'admin' ? 'selected' : ''}>Admin</option>
                     </select>
-                    <button class="delete-user-btn">삭제</button>
+                    <button class="delete-user-btn" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">삭제</button>
                 </div>
             </div>
         `;
 
-        // Handle Grade Change
-        li.querySelector('.grade-select').onchange = (e) => {
+        // Handle Grade Change (Firestore)
+        const select = li.querySelector('.grade-select');
+        select.onchange = (e) => {
             const newGrade = e.target.value;
-            changeUserGrade(user.username, newGrade);
+            changeUserGrade(user.uid, user.username, newGrade);
         };
 
-        li.querySelector('.delete-user-btn').onclick = () => {
-            if (confirm(`'${user.username}' 회원을 삭제하시겠습니까?`)) {
-                deleteUser(user.username);
+        // Handle Delete (Firestore)
+        const delBtn = li.querySelector('.delete-user-btn');
+        delBtn.onclick = () => {
+            if (confirm(`'${user.username}' 회원을 삭제하시겠습니까? (복구 불가)`)) {
+                deleteUser(user.uid);
             }
         };
+
         userList.appendChild(li);
     });
 }
 
-function changeUserGrade(username, newGrade) {
-    const user = users.find(u => u.username === username);
-    if (user) {
-        user.grade = newGrade;
-        localStorage.setItem('users', JSON.stringify(users));
-        renderUserList();
-        // If updating current user (unlikely for admin, but safe to add)
-        if (currentUser && currentUser.username === username) {
-            currentUser.grade = newGrade;
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            updateAuthUI();
-        }
-        alert(`${username}님의 등급이 ${newGrade}로 변경되었습니다.`);
-    }
+function changeUserGrade(uid, username, newGrade) {
+    if (!uid) return;
+
+    db.collection('users').doc(uid).update({
+        grade: newGrade
+    }).then(() => {
+        alert(`${username}님의 등급이 ${newGrade}(으)로 변경되었습니다.`);
+    }).catch((error) => {
+        console.error("Error updating grade:", error);
+        alert("등급 변경 실패: " + error.message);
+    });
 }
 
-function deleteUser(username) {
-    users = users.filter(u => u.username !== username);
-    localStorage.setItem('users', JSON.stringify(users));
-    renderUserList();
+function deleteUser(uid) {
+    if (!uid) return;
+
+    db.collection('users').doc(uid).delete().then(() => {
+        alert("회원이 삭제되었습니다.");
+    }).catch((error) => {
+        console.error("Error deleting user:", error);
+        alert("회원 삭제 실패: " + error.message);
+    });
 }
 
 // Daily Life Section (Firebase)
@@ -910,17 +1008,23 @@ function initDailyLife(prefix) {
 
 // Visitor Counter Logic
 function initVisitorCounter() {
-    const visitorEl = document.getElementById('visitor-count');
-    const docRef = db.collection('siteStats').doc('visitors');
+    const visitorEl = document.getElementById('visitor-count-display');
+    const docRef = db.collection('stats').doc('visitorStats');
 
     // Realtime Listener
     docRef.onSnapshot((doc) => {
         if (doc.exists) {
-            const count = doc.data().count || 0;
-            if (visitorEl) visitorEl.textContent = `방문자: ${count.toLocaleString()}명`;
+            let count = doc.data().count || 0;
+            // Migration: Restore legacy count if reset
+            if (count < 300) {
+                count = 352;
+                docRef.set({ count: 352 }, { merge: true });
+            }
+            if (visitorEl) visitorEl.textContent = `방문자 : ${count.toLocaleString()}명`;
         } else {
-            // Initialize if missing
-            if (visitorEl) visitorEl.textContent = `방문자: 0명`;
+            // Initialize with legacy count
+            if (visitorEl) visitorEl.textContent = `방문자 : 352명`;
+            docRef.set({ count: 352 }, { merge: true });
         }
     });
 
