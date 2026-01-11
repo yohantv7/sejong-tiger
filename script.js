@@ -615,14 +615,9 @@ function updateAuthUI() {
             depositListContainer.style.display = 'block';
         }
 
-        // Lecture Video Access
-        if (isAdmin || grade === 'C') {
-            if (videoLockOverlay) videoLockOverlay.style.display = 'none';
-            if (openVideoPopupBtn) openVideoPopupBtn.style.display = 'block';
-        } else {
-            if (videoLockOverlay) videoLockOverlay.style.display = 'flex';
-            if (openVideoPopupBtn) openVideoPopupBtn.style.display = 'none';
-        }
+        // Lecture Video Access - OPEN TO ALL
+        if (videoLockOverlay) videoLockOverlay.style.display = 'none';
+        if (openVideoPopupBtn) openVideoPopupBtn.style.display = 'block';
 
         const userMgmtSection = document.getElementById('user-management-section');
         // Admin Sections
@@ -643,8 +638,8 @@ function updateAuthUI() {
         if (userMgmtSection) userMgmtSection.style.display = 'none';
         adminEditors.forEach(editor => editor.style.display = 'none');
 
-        if (videoLockOverlay) videoLockOverlay.style.display = 'flex';
-        if (openVideoPopupBtn) openVideoPopupBtn.style.display = 'none';
+        if (videoLockOverlay) videoLockOverlay.style.display = 'none';
+        if (openVideoPopupBtn) openVideoPopupBtn.style.display = 'block';
 
         if (requestInputArea) requestInputArea.style.display = 'none';
         if (requestHint) requestHint.textContent = '로그인 후 요청사항 작성이 가능합니다.';
