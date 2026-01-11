@@ -1050,7 +1050,7 @@ document.addEventListener('DOMContentLoaded', () => {
         initRequestSync();
         initVisitorCounter();
         populateTimeSelectors(); // Populating time dropdowns
-        initDailyLife('ryeoeun');
+        // initDailyLife('ryeoeun');
 
         renderUserList();
         fetchWeather(); // Initial weather fetch
