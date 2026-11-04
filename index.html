@@ -74,43 +74,8 @@
             </section>
         </div>
 
-        <!-- ③ 사진 올리기(파랑) + 미리보기 + 오늘 -->
+        <!-- ③ 오늘 -->
         <div class="m-row">
-            <section class="cell blue upload">
-                <h2 style="font-size:22px">일상 사진 올리기</h2>
-                <p class="muted">오늘의 순간을 기록해 보세요</p>
-                <!-- 관리자에게만 보임 (script.js가 .admin-daily-editor 표시 여부를 제어) -->
-                <div class="admin-daily-editor" style="display:none; flex:1;">
-                    <label class="drop" for="daily-img-upload-1" id="daily-drop" tabindex="0">
-                        <span>여기에 사진을 끌어놓거나</span>
-                        <span class="btn"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4M7 9l5-5 5 5M4 16v4h16v-4"/></svg>사진 선택</span>
-                    </label>
-                    <input class="sr-only" id="daily-img-upload-1" type="file" accept="image/*">
-                </div>
-                <p class="muted upload-guest" id="daily-guest-note">사진은 관리자가 올립니다.<br>오른쪽에서 오늘의 일상을 구경하세요.</p>
-            </section>
-
-            <section class="cell preview">
-                <div style="display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap">
-                    <h2 style="font-size:22px">미리보기</h2>
-                    <span class="muted" style="font-size:13px">오늘의 일상 사진</span>
-                </div>
-                <div class="inner-grid">
-                    <div class="photo">
-                        아직 올라온 사진이 없습니다
-                        <img id="daily-display-img-1" alt="오늘의 일상 사진" style="display:none">
-                    </div>
-                    <div class="post">
-                        <span class="eyebrow" id="daily-post-date"></span>
-                        <strong style="font-size:18px">오늘의 일상</strong>
-                        <p class="muted">사진을 고르면 여기서 먼저 확인한 뒤 저장할 수 있습니다.</p>
-                        <div class="admin-daily-editor" style="display:none; margin-top:auto;">
-                            <button id="daily-save-btn-1" type="button" class="btn btn-solid" style="width:100%">사진 저장하기</button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
             <section class="cell today">
                 <div class="today-top">
                     <h3 id="date"></h3>
@@ -138,7 +103,7 @@
             </section>
         </div>
 
-        <!-- ④ 소통의 창 + 회원 등급(노랑) -->
+        <!-- ④ 소통의 창 -->
         <div class="m-row">
             <section class="cell community request-section">
                 <h2 style="font-size:22px">소통의 창</h2>
@@ -172,19 +137,6 @@
                 </div>
             </section>
 
-            <section class="cell tier">
-                <span class="eyebrow">B등급</span>
-                <strong style="font-size:20px">우수회원</strong>
-                <span class="price">1만원</span>
-                <button type="button" class="btn btn-line" data-deposit="10,000">입금 확인 요청</button>
-            </section>
-            <section class="cell yellow tier">
-                <span class="eyebrow">C등급 · VIP</span>
-                <strong style="font-size:20px">VIP회원</strong>
-                <span class="price">10만원</span>
-                <button type="button" class="btn btn-solid" data-deposit="100,000">입금 확인 요청</button>
-                <button id="open-deposit-modal-btn" type="button" class="sr-only" tabindex="-1">입금 확인 요청</button>
-            </section>
         </div>
 
         <!-- ⑤ 제휴 + 푸터 -->
@@ -384,44 +336,6 @@
             sync();
         })();
 
-        // 일상 사진: 관리자 업로드 → 모두에게 미리보기 (script.js의 initDailyLife 재사용)
-        document.addEventListener('DOMContentLoaded', function () {
-            const d = new Date();
-            const dateEl = document.getElementById('daily-post-date');
-            if (dateEl) dateEl.textContent = d.getFullYear() + '.' + String(d.getMonth() + 1).padStart(2, '0') + '.' + String(d.getDate()).padStart(2, '0');
-
-            try { if (typeof initDailyLife === 'function') initDailyLife('daily'); } catch (e) { console.error(e); }
-
-            const input = document.getElementById('daily-img-upload-1');
-            const drop = document.getElementById('daily-drop');
-            const img = document.getElementById('daily-display-img-1');
-            function previewFile(file) {
-                if (!file || !file.type.startsWith('image/') || !img) return;
-                img.src = URL.createObjectURL(file);
-                img.style.display = 'block';
-            }
-            if (input) input.addEventListener('change', function () { previewFile(input.files[0]); });
-            if (drop && input) {
-                drop.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); input.click(); } });
-                ['dragenter', 'dragover'].forEach(function (t) { drop.addEventListener(t, function (e) { e.preventDefault(); drop.classList.add('drag'); }); });
-                ['dragleave', 'drop'].forEach(function (t) { drop.addEventListener(t, function (e) { e.preventDefault(); drop.classList.remove('drag'); }); });
-                drop.addEventListener('drop', function (e) {
-                    const f = e.dataTransfer.files[0];
-                    if (!f) return;
-                    const dt = new DataTransfer(); dt.items.add(f); input.files = dt.files;
-                    previewFile(f);
-                });
-            }
-
-            // 관리자일 때는 안내 문구 숨기기
-            const guestNote = document.getElementById('daily-guest-note');
-            const editor = document.querySelector('.upload .admin-daily-editor');
-            if (guestNote && editor) {
-                new MutationObserver(function () {
-                    guestNote.style.display = editor.style.display === 'block' ? 'none' : '';
-                }).observe(editor, { attributes: true, attributeFilter: ['style'] });
-            }
-        });
     </script>
 </body>
 
