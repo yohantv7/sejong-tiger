@@ -102,7 +102,8 @@ h1, h2, h3, h4, p { margin: 0; }
 /* 주식정보 칸 배경: 삼성전자우 공포·탐욕 게이지 */
 .cat-fg { position: relative; overflow: hidden; }
 .cat-fg > :not(.cat-bg) { position: relative; z-index: 1; }
-.cat-bg { position: absolute; right: 10px; bottom: 8px; width: 58%; max-width: 250px; opacity: .38; pointer-events: none; z-index: 0; }
+.cat-fg > .num, .cat-fg > strong, .cat-fg > .muted { text-shadow: 0 0 2px #FFFDF9, 0 0 6px #FFFDF9, 0 0 10px #FFFDF9; }
+.cat-bg { position: absolute; right: 8px; bottom: 6px; width: 50%; max-width: 230px; opacity: .34; pointer-events: none; z-index: 0; }
 .cat-bg #cat-fg-needle line { stroke: #1C1B18; }
 .cat-bg circle { fill: #1C1B18; }
 .cat-bg text { fill: #3D3A34; }
