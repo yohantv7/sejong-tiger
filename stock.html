@@ -161,6 +161,12 @@
         .buy-btn:hover {
             filter: brightness(1.1);
         }
+        /* 기술적 분석 위젯 시간 탭 (한국어) */
+        .ta-tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-bottom: 8px; }
+        .ta-tabs button { background: transparent; border: 1px solid transparent; color: #94a3b8; font-size: 0.95rem; padding: 6px 12px; min-height: 36px; border-radius: 8px; cursor: pointer; font-family: inherit; }
+        .ta-tabs button:hover { color: #fff; background: rgba(255, 255, 255, 0.06); }
+        .ta-tabs button[aria-selected="true"] { color: #fff; font-weight: 700; background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.15); }
+        .ta-tabs button:focus-visible { outline: 2px solid #ffd700; outline-offset: 2px; }
     </style>
 </head>
 
@@ -217,29 +223,16 @@
         <!-- 2. Market Sentiment (Fear & Greed) -->
         <h2 class="section-title">시장 심리 (공포 vs 탐욕) 😨🤑</h2>
         <p style="color: #cbd5e1; margin-bottom: 20px;">
-            S&P 500 시장의 기술적 강도를 통해 심리를 파악합니다. <br>
-            <span style="color: #ef4444;">Strong Sell (공포)</span> ↔ <span style="color: #22c55e;">Strong Buy (탐욕)</span>
+            <strong style="color: #ffd700;">SPY란?</strong> 미국 대표 기업 500개로 이루어진 <strong>S&amp;P 500 지수</strong>를 그대로 따라가는 ETF(상장지수펀드)입니다.
+            종목 코드(티커)가 SPY이고, 정식 이름은 SPDR S&amp;P 500 ETF Trust입니다.
+            SPY 하나를 사면 애플·마이크로소프트·엔비디아 같은 500개 기업에 조금씩 나눠 투자하는 효과가 있어서,
+            SPY의 기술적 분석은 곧 <strong>미국 주식시장 전체의 분위기</strong>를 보여 줍니다. <br>
+            <span style="color: #ef4444;">Strong Sell (공포)</span> ↔ <span style="color: #22c55e;">Strong Buy (탐욕)</span> ·
+            <span style="color: #ef4444;">셀 = 매도</span> · <span style="color: #cbd5e1;">뉴트럴 = 중립</span> · <span style="color: #22c55e;">바이 = 매수</span>
         </p>
         <div class="glass-panel" style="padding: 20px; margin-bottom: 50px;">
-            <!-- TradingView Widget BEGIN -->
-            <div class="tradingview-widget-container">
-                <div class="tradingview-widget-container__widget"></div>
-                <script type="text/javascript"
-                    src="https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js" async>
-                        {
-                            "interval": "1D",
-                                "width": "100%",
-                                    "isTransparent": true,
-                                        "height": 400,
-                                            "symbol": "AMEX:SPY",
-                                                "showIntervalTabs": true,
-                                                    "displayMode": "single",
-                                                        "locale": "kr",
-                                                            "colorTheme": "dark"
-                        }
-                    </script>
-            </div>
-            <!-- TradingView Widget END -->
+            <!-- 기술적 분석 위젯 (시간 탭은 아래 스크립트가 한국어로 만듦) -->
+            <div class="ta-block" data-symbol="AMEX:SPY"></div>
         </div>
 
         <!-- 알파벳 A (GOOGL) 기술적 분석 -->
@@ -249,25 +242,8 @@
             <span style="color: #ef4444;">셀 = 매도</span> · <span style="color: #cbd5e1;">뉴트럴 = 중립</span> · <span style="color: #22c55e;">바이 = 매수</span>
         </p>
         <div class="glass-panel" style="padding: 20px; margin-bottom: 50px;">
-            <!-- TradingView Widget BEGIN -->
-            <div class="tradingview-widget-container">
-                <div class="tradingview-widget-container__widget"></div>
-                <script type="text/javascript"
-                    src="https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js" async>
-                        {
-                            "interval": "1D",
-                            "width": "100%",
-                            "isTransparent": true,
-                            "height": 400,
-                            "symbol": "NASDAQ:GOOGL",
-                            "showIntervalTabs": true,
-                            "displayMode": "single",
-                            "locale": "kr",
-                            "colorTheme": "dark"
-                        }
-                    </script>
-            </div>
-            <!-- TradingView Widget END -->
+            <!-- 기술적 분석 위젯 (시간 탭은 아래 스크립트가 한국어로 만듦) -->
+            <div class="ta-block" data-symbol="NASDAQ:GOOGL"></div>
         </div>
 
         <!-- 삼성전자우 (005935) 기술적 분석 -->
@@ -277,25 +253,8 @@
             <span style="color: #ef4444;">셀 = 매도</span> · <span style="color: #cbd5e1;">뉴트럴 = 중립</span> · <span style="color: #22c55e;">바이 = 매수</span>
         </p>
         <div class="glass-panel" style="padding: 20px; margin-bottom: 50px;">
-            <!-- TradingView Widget BEGIN -->
-            <div class="tradingview-widget-container">
-                <div class="tradingview-widget-container__widget"></div>
-                <script type="text/javascript"
-                    src="https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js" async>
-                        {
-                            "interval": "1D",
-                            "width": "100%",
-                            "isTransparent": true,
-                            "height": 400,
-                            "symbol": "KRX:005935",
-                            "showIntervalTabs": true,
-                            "displayMode": "single",
-                            "locale": "kr",
-                            "colorTheme": "dark"
-                        }
-                    </script>
-            </div>
-            <!-- TradingView Widget END -->
+            <!-- 기술적 분석 위젯 (시간 탭은 아래 스크립트가 한국어로 만듦) -->
+            <div class="ta-block" data-symbol="KRX:005935"></div>
         </div>
         <!-- 2. Stock Renamed (No Widget) -->
         <h2 class="section-title">주식고수가 매수한 미국 종목 정보</h2>
@@ -732,6 +691,55 @@
             </p>
         </div>
 
+    <script>
+        // TradingView 기술적 분석 위젯: 위젯 자체 시간 탭("1 날" 표기)을 숨기고 한국어 탭을 직접 만듦
+        (function () {
+            var INTERVALS = [['1m', '1분'], ['5m', '5분'], ['15m', '15분'], ['30m', '30분'], ['1h', '1시간'],
+                ['2h', '2시간'], ['4h', '4시간'], ['1D', '1일'], ['1W', '1주'], ['1M', '1달']];
+            function draw(host, symbol, interval) {
+                host.innerHTML = '';
+                var box = document.createElement('div');
+                box.className = 'tradingview-widget-container';
+                var inner = document.createElement('div');
+                inner.className = 'tradingview-widget-container__widget';
+                box.appendChild(inner);
+                var sc = document.createElement('script');
+                sc.type = 'text/javascript';
+                sc.src = 'https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js';
+                sc.async = true;
+                sc.textContent = JSON.stringify({
+                    interval: interval, width: '100%', isTransparent: true, height: 360,
+                    symbol: symbol, showIntervalTabs: false, displayMode: 'single', locale: 'kr', colorTheme: 'dark'
+                });
+                box.appendChild(sc);
+                host.appendChild(box);
+            }
+            document.querySelectorAll('.ta-block').forEach(function (block) {
+                var symbol = block.dataset.symbol;
+                var tabs = document.createElement('div');
+                tabs.className = 'ta-tabs';
+                tabs.setAttribute('role', 'tablist');
+                tabs.setAttribute('aria-label', symbol + ' 시간 단위');
+                var host = document.createElement('div');
+                block.appendChild(tabs);
+                block.appendChild(host);
+                INTERVALS.forEach(function (iv) {
+                    var b = document.createElement('button');
+                    b.type = 'button';
+                    b.setAttribute('role', 'tab');
+                    b.textContent = iv[1];
+                    b.setAttribute('aria-selected', iv[0] === '1D' ? 'true' : 'false');
+                    b.addEventListener('click', function () {
+                        tabs.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-selected', 'false'); });
+                        b.setAttribute('aria-selected', 'true');
+                        draw(host, symbol, iv[0]);
+                    });
+                    tabs.appendChild(b);
+                });
+                draw(host, symbol, '1D');
+            });
+        })();
+    </script>
 </body>
 
 </html>
