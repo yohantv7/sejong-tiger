@@ -188,6 +188,21 @@
         .fg-foot { margin: 14px 0 0; font-size: 0.8rem; color: #94a3b8; text-align: center; }
         .fg-foot a { color: #60a5fa; }
 
+        /* 종목별 공포·탐욕 지수 (자체 지표) */
+        .sfg-badge { display: block; text-align: center; font-size: 0.75rem; color: #ffd700; margin: 2px 0 6px; }
+        .sfg-parts { list-style: none; margin: 18px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+        .sfg-parts li { display: flex; flex-direction: column; gap: 5px; }
+        .sfg-row { display: flex; justify-content: space-between; gap: 10px; font-size: 0.85rem; color: #cbd5e1; }
+        .sfg-row small { color: #94a3b8; font-size: 0.85rem; }
+        .sfg-row b { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .sfg-bar { height: 8px; background: rgba(255, 255, 255, 0.08); border-radius: 999px; overflow: hidden; }
+        .sfg-bar span { display: block; height: 100%; border-radius: 999px; transition: width .6s ease; }
+        .sfg details { margin-top: 14px; font-size: 0.85rem; color: #cbd5e1; }
+        .sfg summary { cursor: pointer; color: #94a3b8; min-height: 32px; display: flex; align-items: center; justify-content: center; }
+        .sfg details ul { margin: 6px 0 0; padding-left: 18px; line-height: 1.8; }
+        .sfg-note { margin: 12px 0 0; font-size: 0.8rem; color: #94a3b8; text-align: center; line-height: 1.6; }
+        .sfg-in-popup { border-top: 1px solid rgba(255, 255, 255, 0.1); margin-top: 8px; padding: 18px 4px 6px; }
+
         /* 종목 검색 */
         .ss-panel { padding: 20px; margin-bottom: 30px; position: relative; }
         .ss-box { display: flex; align-items: center; gap: 10px; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 12px; padding: 0 14px; color: #94a3b8; }
@@ -324,6 +339,11 @@
                 <!-- 기술적 분석 위젯 (시간 탭은 아래 스크립트가 한국어로 만듦) -->
                 <div class="ta-block" data-symbol="AMEX:SPY"></div>
             </div>
+            <!-- SPY 공포·탐욕 지수 (자체 지표) -->
+            <div class="glass-panel fg-card">
+                <div class="sfg" data-symbol="AMEX:SPY" data-name="SPY"
+                    data-note="CNN 지수는 옵션·채권 같은 투자 심리까지 보고, 이 지표는 가격 위치만 봅니다. 그래서 두 값이 다를 수 있습니다."></div>
+            </div>
         </div>
 
         <!-- 알파벳 A (GOOGL) 기술적 분석 -->
@@ -332,9 +352,15 @@
             구글 모회사 알파벳의 A주(의결권 있는 주식)에 대한 지표 요약입니다. <br>
             <span style="color: #ef4444;">셀 = 매도</span> · <span style="color: #cbd5e1;">뉴트럴 = 중립</span> · <span style="color: #22c55e;">바이 = 매수</span>
         </p>
-        <div class="glass-panel" style="padding: 20px; margin-bottom: 50px;">
-            <!-- 기술적 분석 위젯 (시간 탭은 아래 스크립트가 한국어로 만듦) -->
-            <div class="ta-block" data-symbol="NASDAQ:GOOGL"></div>
+        <div class="fg-row">
+            <div class="glass-panel fg-card">
+                <!-- 기술적 분석 위젯 -->
+                <div class="ta-block" data-symbol="NASDAQ:GOOGL"></div>
+            </div>
+            <div class="glass-panel fg-card">
+                <!-- 종목별 공포·탐욕 지수 (자체 지표) -->
+                <div class="sfg" data-symbol="NASDAQ:GOOGL" data-name="알파벳 A"></div>
+            </div>
         </div>
 
         <!-- 삼성전자우 (005935) 기술적 분석 -->
@@ -343,9 +369,15 @@
             삼성전자 우선주(의결권 대신 배당을 조금 더 받는 주식)에 대한 지표 요약입니다. <br>
             <span style="color: #ef4444;">셀 = 매도</span> · <span style="color: #cbd5e1;">뉴트럴 = 중립</span> · <span style="color: #22c55e;">바이 = 매수</span>
         </p>
-        <div class="glass-panel" style="padding: 20px; margin-bottom: 50px;">
-            <!-- 기술적 분석 위젯 (시간 탭은 아래 스크립트가 한국어로 만듦) -->
-            <div class="ta-block" data-symbol="KRX:005935"></div>
+        <div class="fg-row">
+            <div class="glass-panel fg-card">
+                <!-- 기술적 분석 위젯 -->
+                <div class="ta-block" data-symbol="KRX:005935"></div>
+            </div>
+            <div class="glass-panel fg-card">
+                <!-- 종목별 공포·탐욕 지수 (자체 지표) -->
+                <div class="sfg" data-symbol="KRX:005935" data-name="삼성전자우"></div>
+            </div>
         </div>
         <!-- 2. Stock Renamed (No Widget) -->
         <h2 class="section-title">주식고수가 매수한 미국 종목 정보</h2>
@@ -995,8 +1027,14 @@
                 block.className = 'ta-block';
                 block.dataset.symbol = it.symbol;
                 body.appendChild(block);
+                var fg = document.createElement('div');
+                fg.className = 'sfg sfg-in-popup';
+                fg.dataset.symbol = it.symbol;
+                fg.dataset.name = it.name.split(' · ')[0];
+                body.appendChild(fg);
                 dlg.showModal();
                 if (window.initTA) window.initTA(block);
+                if (window.initSFG) window.initSFG(fg);
             }
             document.getElementById('ss-close').addEventListener('click', function () { dlg.close(); });
             dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
@@ -1039,6 +1077,98 @@
                     ratingEl.textContent = '지금은 값을 불러오지 못했습니다';
                     ratingEl.style.color = '#94a3b8';
                 });
+        })();
+    </script>
+    <script>
+        // 종목별 공포·탐욕 지수 (세종호랑이 자체 지표): 5가지 값을 0~100점으로 바꿔 평균
+        (function () {
+            var GAUGE = '<svg viewBox="0 -14 220 134" width="100%" style="max-width:320px;display:block;margin:0 auto" role="img" aria-label="공포·탐욕 지수 게이지"><path d="M30.0 100.0 A80 80 0 0 1 52.0 44.9" stroke="#dc2626" stroke-width="16" fill="none" stroke-linecap="butt"/><path d="M54.9 42.0 A80 80 0 0 1 95.5 21.3" stroke="#f97316" stroke-width="16" fill="none" stroke-linecap="butt"/><path d="M99.5 20.7 A80 80 0 0 1 120.5 20.7" stroke="#94a3b8" stroke-width="16" fill="none" stroke-linecap="butt"/><path d="M124.5 21.3 A80 80 0 0 1 165.1 42.0" stroke="#4ade80" stroke-width="16" fill="none" stroke-linecap="butt"/><path d="M168.0 44.9 A80 80 0 0 1 190.0 100.0" stroke="#16a34a" stroke-width="16" fill="none" stroke-linecap="butt"/><text x="10.0" y="104.0" text-anchor="middle" font-size="10" fill="#94a3b8">0</text><text x="39.3" y="33.3" text-anchor="middle" font-size="10" fill="#94a3b8">25</text><text x="110.0" y="4.0" text-anchor="middle" font-size="10" fill="#94a3b8">50</text><text x="180.7" y="33.3" text-anchor="middle" font-size="10" fill="#94a3b8">75</text><text x="210.0" y="104.0" text-anchor="middle" font-size="10" fill="#94a3b8">100</text><g class="sfg-needle" style="transform-origin:110px 100px;transform:rotate(-90deg);transition:transform .8s ease"><line x1="110" y1="100" x2="110" y2="32" stroke="#f1f5f9" stroke-width="4" stroke-linecap="round"/></g><circle cx="110" cy="100" r="7" fill="#f1f5f9"/></svg>';
+            var LV = [[25, '극단적 공포', '#f87171'], [45, '공포', '#fb923c'], [56, '중립', '#cbd5e1'], [76, '탐욕', '#4ade80'], [101, '극단적 탐욕', '#22c55e']];
+            function level(v) { for (var i = 0; i < LV.length; i++) if (v < LV[i][0]) return LV[i]; return LV[LV.length - 1]; }
+            function clamp(x) { return Math.max(0, Math.min(100, x)); }
+            function pct(x) { return (x > 0 ? '+' : '') + x.toFixed(1) + '%'; }
+            function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+            var COLS = ['close', 'RSI', 'Stoch.K', 'price_52_week_high', 'price_52_week_low', 'SMA50', 'Perf.1M'];
+
+            function initSFG(box) {
+                var symbol = box.dataset.symbol, name = box.dataset.name || symbol.split(':')[1];
+                box.innerHTML = '';
+                box.appendChild(el('h3', 'fg-head', name + '의 공포·탐욕 지수'));
+                box.appendChild(el('span', 'sfg-badge', '세종호랑이 자체 지표 · CNN 공식 지수 아님'));
+                var g = document.createElement('div');
+                g.innerHTML = GAUGE;
+                var svg = g.firstElementChild;
+                box.appendChild(svg);
+                var sc = el('div', 'fg-score');
+                var num = el('span', null, '–'); num.style.cssText = 'font-size:2.6rem;font-weight:800;color:#f1f5f9;line-height:1.1';
+                var rate = el('span', 'fg-rating', '불러오는 중…');
+                sc.append(num, rate);
+                box.appendChild(sc);
+                var ul = el('ul', 'sfg-parts');
+                box.appendChild(ul);
+                var det = el('details');
+                det.appendChild(el('summary', null, '점수 계산 방법 보기'));
+                var dl = el('ul');
+                ['상대강도(RSI 14일): 값 그대로 점수. 30 이하 과매도(공포), 70 이상 과매수(탐욕)',
+                 '단기 위치(스토캐스틱): 최근 14일 가격 범위에서 지금 가격의 위치',
+                 '52주 위치: 1년 최저가 = 0점, 1년 최고가 = 100점',
+                 '추세(50일선 대비): 10% 아래 = 0점, 같으면 50점, 10% 위 = 100점',
+                 '한 달 수익률: −20% = 0점, 0% = 50점, +20% = 100점',
+                 '다섯 점수의 평균. 구간은 CNN과 같음(0~24 극단적 공포 · 25~44 공포 · 45~55 중립 · 56~75 탐욕 · 76~100 극단적 탐욕)'
+                ].forEach(function (t) { dl.appendChild(el('li', null, t)); });
+                det.appendChild(dl);
+                box.appendChild(det);
+                if (box.dataset.note) box.appendChild(el('p', 'sfg-note', box.dataset.note));
+
+                var market = symbol.indexOf('KRX:') === 0 ? 'korea' : 'america';
+                fetch('https://scanner.tradingview.com/' + market + '/scan', {
+                    method: 'POST',
+                    body: JSON.stringify({ symbols: { tickers: [symbol], query: { types: [] } }, columns: COLS })
+                }).then(function (r) { return r.json(); }).then(function (j) {
+                    var d = j && j.data && j.data[0] && j.data[0].d;
+                    if (!d) throw new Error('no data');
+                    var c = d[0], rsi = d[1], st = d[2], hi = d[3], lo = d[4], ma = d[5], m1 = d[6];
+                    var parts = [];
+                    if (typeof rsi === 'number') parts.push(['상대강도(RSI)', rsi.toFixed(0), rsi]);
+                    if (typeof st === 'number') parts.push(['단기 위치(스토캐스틱)', st.toFixed(0), st]);
+                    if (typeof c === 'number' && typeof hi === 'number' && typeof lo === 'number' && hi > lo)
+                        parts.push(['52주 위치', '최고가 대비 ' + pct((c / hi - 1) * 100), (c - lo) / (hi - lo) * 100]);
+                    if (typeof c === 'number' && typeof ma === 'number' && ma > 0) {
+                        var gap = (c / ma - 1) * 100;
+                        parts.push(['추세(50일선 대비)', pct(gap), 50 + gap * 5]);
+                    }
+                    if (typeof m1 === 'number') parts.push(['한 달 수익률', pct(m1), 50 + m1 * 2.5]);
+                    if (!parts.length) throw new Error('no parts');
+                    var total = 0;
+                    parts.forEach(function (pt) {
+                        var v = Math.round(clamp(pt[2])), l = level(v);
+                        total += v;
+                        var li = el('li');
+                        var row = el('div', 'sfg-row');
+                        var lab = el('span', null, pt[0] + ' ');
+                        lab.appendChild(el('small', null, '· ' + pt[1]));
+                        var pts = el('b', null, v + '점'); pts.style.color = l[2];
+                        row.append(lab, pts);
+                        var bar = el('div', 'sfg-bar'), fill = el('span');
+                        fill.style.width = '0%'; fill.style.background = l[2];
+                        bar.appendChild(fill);
+                        li.append(row, bar);
+                        ul.appendChild(li);
+                        requestAnimationFrame(function () { fill.style.width = v + '%'; });
+                    });
+                    var score = Math.round(total / parts.length), lv = level(score);
+                    num.textContent = score;
+                    rate.textContent = lv[1];
+                    rate.style.color = lv[2];
+                    svg.querySelector('.sfg-needle').style.transform = 'rotate(' + (-90 + score * 1.8) + 'deg)';
+                    svg.setAttribute('aria-label', name + ' 공포·탐욕 지수 ' + score + '점, ' + lv[1]);
+                }).catch(function () {
+                    rate.textContent = '지금은 값을 불러오지 못했습니다';
+                    rate.style.color = '#94a3b8';
+                });
+            }
+            window.initSFG = initSFG;
+            document.querySelectorAll('.sfg').forEach(initSFG);
         })();
     </script>
 </body>
