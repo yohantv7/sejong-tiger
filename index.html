@@ -42,6 +42,7 @@
                 <div class="auth-cell auth-wrapper">
                     <span id="user-info"></span>
                     <button id="auth-btn" type="button">로그인</button>
+                    <button id="signup-btn" type="button" class="btn">회원가입</button>
                 </div>
             </nav>
         </header>
@@ -339,6 +340,23 @@
             document.addEventListener('keydown', function (e) {
                 if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.active').forEach(function (m) { m.classList.remove('active'); });
             });
+        })();
+
+        // 회원가입 버튼: 같은 팝업을 회원가입 탭으로 열기, 로그인 중에는 숨김
+        (function () {
+            const signupBtn = document.getElementById('signup-btn');
+            const authBtn = document.getElementById('auth-btn');
+            const modal = document.getElementById('auth-modal');
+            if (!signupBtn) return;
+            signupBtn.addEventListener('click', function () {
+                if (modal) modal.classList.add('active');
+                if (typeof setAuthMode === 'function') setAuthMode('register');
+                const email = document.getElementById('auth-email');
+                if (email) email.focus();
+            });
+            function sync() { signupBtn.style.display = authBtn && authBtn.textContent.trim() === '로그아웃' ? 'none' : ''; }
+            if (authBtn) new MutationObserver(sync).observe(authBtn, { childList: true, characterData: true, subtree: true });
+            sync();
         })();
 
         // 일상 사진: 관리자 업로드 → 모두에게 미리보기 (script.js의 initDailyLife 재사용)
