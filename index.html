@@ -47,16 +47,8 @@
             </nav>
         </header>
 
-        <!-- ② 카테고리 + 메인(빨강) -->
+        <!-- ② 메인(빨강) -->
         <div class="m-row">
-            <div class="m-col cats">
-                <div class="cell cat cat-fg"><div class="cat-bg" aria-hidden="true"><svg viewBox="0 -14 220 134" width="100%" style="display:block" aria-hidden="true" focusable="false"><path d="M30.0 100.0 A80 80 0 0 1 52.0 44.9" stroke="#dc2626" stroke-width="16" fill="none" stroke-linecap="butt"/><path d="M54.9 42.0 A80 80 0 0 1 95.5 21.3" stroke="#f97316" stroke-width="16" fill="none" stroke-linecap="butt"/><path d="M99.5 20.7 A80 80 0 0 1 120.5 20.7" stroke="#94a3b8" stroke-width="16" fill="none" stroke-linecap="butt"/><path d="M124.5 21.3 A80 80 0 0 1 165.1 42.0" stroke="#4ade80" stroke-width="16" fill="none" stroke-linecap="butt"/><path d="M168.0 44.9 A80 80 0 0 1 190.0 100.0" stroke="#16a34a" stroke-width="16" fill="none" stroke-linecap="butt"/><text x="10.0" y="104.0" text-anchor="middle" font-size="10" fill="#94a3b8">0</text><text x="39.3" y="33.3" text-anchor="middle" font-size="10" fill="#94a3b8">25</text><text x="110.0" y="4.0" text-anchor="middle" font-size="10" fill="#94a3b8">50</text><text x="180.7" y="33.3" text-anchor="middle" font-size="10" fill="#94a3b8">75</text><text x="210.0" y="104.0" text-anchor="middle" font-size="10" fill="#94a3b8">100</text><g id="cat-fg-needle" style="transform-origin:110px 100px;transform:rotate(-90deg);transition:transform .8s ease"><line x1="110" y1="100" x2="110" y2="32" stroke="#f1f5f9" stroke-width="4" stroke-linecap="round"/></g><circle cx="110" cy="100" r="7" fill="#f1f5f9"/></svg><div class="cat-bg-score"><b id="cat-fg-score">–</b><span id="cat-fg-rate"></span></div></div><span class="num">01</span><strong>주식정보</strong><span class="muted">미국·한국 고수의 포트폴리오</span>
-                    <a class="btn btn-sm" href="stock.html">바로가기 <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
-                <div class="cell cat"><span class="num">02</span><strong>시니어생활</strong><span class="muted">여유롭고 건강한 하루</span>
-                    <a class="btn btn-sm" href="senior.html">바로가기 <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
-                <div class="cell cat"><span class="num">03</span><strong>마케팅</strong><span class="muted">실전 홍보 노하우</span>
-                    <a class="btn btn-sm" href="marketing.html">바로가기 <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
-            </div>
             <section class="cell red hero">
                 <p class="eyebrow">Web/App Daily Life</p>
                 <h1>SAAS, 홈페이지, 쇼핑몰, 플랫폼 제작을<br>취미로 만듭니다</h1>
@@ -296,31 +288,6 @@
             });
         })();
 
-        // 주식정보 칸 배경: 삼성전자우 공포·탐욕 지수 (세종호랑이 자체 지표, 페이지 열 때마다 새로 계산)
-        (function () {
-            var LV = [[25, '극단적 공포'], [45, '공포'], [56, '중립'], [76, '탐욕'], [101, '극단적 탐욕']];
-            function clamp(x) { return Math.max(0, Math.min(100, x)); }
-            fetch('https://scanner.tradingview.com/korea/scan', {
-                method: 'POST',
-                body: JSON.stringify({ symbols: { tickers: ['KRX:005935'], query: { types: [] } },
-                    columns: ['close', 'RSI', 'Stoch.K', 'price_52_week_high', 'price_52_week_low', 'SMA50', 'Perf.1M'] })
-            }).then(function (r) { return r.json(); }).then(function (j) {
-                var d = j.data[0].d, c = d[0], parts = [];
-                if (typeof d[1] === 'number') parts.push(d[1]);
-                if (typeof d[2] === 'number') parts.push(d[2]);
-                if (d[3] > d[4]) parts.push((c - d[4]) / (d[3] - d[4]) * 100);
-                if (d[5] > 0) parts.push(50 + (c / d[5] - 1) * 500);
-                if (typeof d[6] === 'number') parts.push(50 + d[6] * 2.5);
-                if (!parts.length) return;
-                var score = Math.round(parts.reduce(function (a, v) { return a + Math.round(clamp(v)); }, 0) / parts.length);
-                var label = LV.filter(function (l) { return score < l[0]; })[0][1];
-                document.getElementById('cat-fg-score').textContent = score;
-                document.getElementById('cat-fg-rate').textContent = '삼성전자우 공포·탐욕 지수';
-                document.getElementById('cat-fg-needle').style.transform = 'rotate(' + (-90 + score * 1.8) + 'deg)';
-                var cell = document.querySelector('.cat-fg');
-                if (cell) cell.setAttribute('title', '배경: 삼성전자우 공포·탐욕 지수 ' + score + '점(' + label + '), 세종호랑이 자체 지표');
-            }).catch(function () { var bg = document.querySelector('.cat-bg'); if (bg) bg.style.display = 'none'; });
-        })();
         // 회원가입 버튼: 같은 팝업을 회원가입 탭으로 열기, 로그인 중에는 숨김
         (function () {
             const signupBtn = document.getElementById('signup-btn');
