@@ -872,7 +872,11 @@
                 ['오라클', 'NYSE:ORCL', 'Oracle Corp.'], ['디즈니', 'NYSE:DIS', 'Walt Disney Co.'], ['나이키', 'NYSE:NKE', 'Nike Inc.'],
                 ['맥도날드', 'NYSE:MCD', "McDonald's Corp."], ['존슨앤존슨', 'NYSE:JNJ', 'Johnson & Johnson'], ['엑슨모빌', 'NYSE:XOM', 'Exxon Mobil Corp.'],
                 ['셰브론', 'NYSE:CVX', 'Chevron Corp.'], ['뱅크오브아메리카', 'NYSE:BAC', 'Bank of America'], ['아이온큐', 'NYSE:IONQ', 'IonQ Inc.'],
-                ['SPY', 'AMEX:SPY', 'SPDR S&P 500 ETF Trust'], ['QQQ', 'NASDAQ:QQQ', 'Invesco QQQ Trust'], ['슈드', 'AMEX:SCHD', 'Schwab US Dividend Equity ETF']
+                ['SPY', 'AMEX:SPY', 'SPDR S&P 500 ETF Trust'], ['QQQ', 'NASDAQ:QQQ', 'Invesco QQQ Trust'], ['슈드', 'AMEX:SCHD', 'Schwab US Dividend Equity ETF'],
+                // 한국 종목 줄임말 (TradingView 정식 이름과 다른 것)
+                ['현대차', 'KRX:005380', '현대자동차보통주'], ['현대차우', 'KRX:005385', '현대자동차1우선주'], ['하이닉스', 'KRX:000660', 'SK하이닉스보통주'],
+                ['엘지엔솔', 'KRX:373220', 'LG에너지솔루션'], ['LG엔솔', 'KRX:373220', 'LG에너지솔루션'], ['삼바', 'KRX:207940', '삼성바이오로직스'],
+                ['네이버', 'KRX:035420', 'NAVER'], ['포스코', 'KRX:005490', 'POSCO홀딩스'], ['엘지전자', 'KRX:066570', 'LG전자'], ['엘지화학', 'KRX:051910', 'LG화학']
             ];
             var hasHangul = function (t) { return /[ㄱ-힝]/.test(t); };
             var norm = function (t) { return t.replace(/\s+/g, '').toLowerCase(); };
