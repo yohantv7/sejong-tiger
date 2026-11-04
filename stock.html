@@ -1142,6 +1142,28 @@
                     t2.appendChild(el('span', 's', nd <= 0 ? '현금이 빚보다 많음' : '빚이 현금보다 많음'));
                 } else t2.appendChild(el('b', null, '정보 없음'));
                 grid.appendChild(t2);
+                // 전 분기 대비 증감 (공시 데이터: 미국 SEC, 한국 DART) — /api/fundamentals
+                var c1 = el('span', 's', '전 분기 대비: 불러오는 중…'), c2 = el('span', 's', '전 분기 대비: 불러오는 중…');
+                t1.appendChild(c1); t2.appendChild(c2);
+                function endLabel(e) { var m = /^(\d{4})-(\d{2})/.exec(e || ''); return m ? m[1] + '년 ' + (+m[2]) + '월 말' : ''; }
+                function change(elm, pair, unitCur, label) {
+                    if (!pair || pair.length < 2) { elm.textContent = '전 분기 대비: 비교할 공시 자료 없음'; return; }
+                    var a = pair[0].val, b = pair[1].val, diff = a - b;
+                    var txt = '전 분기 대비 ' + (diff > 0 ? '▲ ' : diff < 0 ? '▼ ' : '') + money(Math.abs(diff), unitCur) + (diff > 0 ? ' 증가' : diff < 0 ? ' 감소' : ' 변화 없음');
+                    if (a > 0 && b > 0) txt += ' (' + (diff >= 0 ? '+' : '') + (diff / b * 100).toFixed(1) + '%)';
+                    txt += ' · ' + endLabel(pair[0].end) + ' ' + money(a, unitCur) + ' ← ' + endLabel(pair[1].end) + ' ' + money(b, unitCur) + ' (' + label + ')';
+                    elm.textContent = txt;
+                    elm.style.color = diff >= 0 ? '#86efac' : '#fca5a5';
+                }
+                fetch('/api/fundamentals?symbol=' + encodeURIComponent(box.dataset.symbol))
+                    .then(function (r) { return r.json(); })
+                    .then(function (j) {
+                        if (j.needsKey) { c1.textContent = c2.textContent = '전 분기 대비: DART 인증키 등록 후 표시됩니다'; return; }
+                        if (j.unsupported || j.error) throw new Error(j.error || 'unsupported');
+                        change(c1, j.operatingIncome, j.currency, j.source + ' 공시');
+                        change(c2, j.netCash, j.currency, j.source + ' 공시, 현금성자산 − 차입금');
+                    })
+                    .catch(function () { c1.textContent = c2.textContent = '전 분기 대비: 공시 자료를 불러오지 못했습니다'; });
                 // FCF(잉여현금흐름) = 영업으로 번 현금 − 설비투자. 전 분기 대비 증감 포함
                 var t3 = el('div', 'sfg-tile');
                 var k3 = el('span', 'k', 'FCF(잉여현금흐름)');
