@@ -82,11 +82,13 @@ h1, h2, h3, h4, p { margin: 0; }
 .hero { flex: 3 1 600px; padding: 56px; display: flex; flex-direction: column; gap: 28px; }
 .hero h1 { font-size: clamp(32px, 4.2vw, 52px); line-height: 1.3; letter-spacing: -.01em; }
 .lecture { flex-wrap: wrap; }
-.lecture .video { flex: 3 1 360px; aspect-ratio: 16 / 9; }
-.lecture .video iframe { width: 100%; height: 100%; border: 0; display: block; }
+.lecture .video { flex: 3 1 360px; aspect-ratio: 16 / 9; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.lecture .video img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.lecture .video .play { position: relative; width: 72px; height: 72px; border-radius: 50%; background: var(--base); border: 2px solid var(--ink); display: flex; align-items: center; justify-content: center; }
+.lecture .video:hover .play { background: var(--fill-yellow); }
 .lecture .info { flex: 1 1 200px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; gap: 16px; }
 .lecture .info strong { font-size: 22px; line-height: 1.4; }
-#open-video-popup-btn { width: 100%; }
+#open-video-popup-btn { width: 100%; display: flex !important; text-align: center; }
 
 /* ---------- ③ 사진 업로드(파랑) + 미리보기 + 오늘 ---------- */
 .upload { flex: 1 1 260px; display: flex; flex-direction: column; gap: 14px; }

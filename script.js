@@ -439,35 +439,7 @@ window.submitDepositRequest = function () {
         });
 };
 
-const openVideoPopupBtn = document.getElementById('open-video-popup-btn');
-if (openVideoPopupBtn) {
-    openVideoPopupBtn.onclick = () => {
-        const popup = window.open('', 'LecturePopup', 'width=1280,height=720');
-        if (popup) {
-            popup.document.write(`
-                <html>
-                <head>
-                    <title>특별 강의 크게 보기</title>
-                    <style>
-                        body { margin: 0; background-color: black; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
-                        iframe { width: 100%; height: 100%; border: none; }
-                    </style>
-                </head>
-                <body>
-                    <iframe src="https://www.youtube.com/embed/coi0usPOiKU?autoplay=1" 
-                        title="YouTube video player" frameborder="0" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        allowfullscreen>
-                    </iframe>
-                </body>
-                </html>
-            `);
-            popup.document.close(); // Ensure page loads
-        } else {
-            alert('팝업 차단을 해제해주세요.');
-        }
-    };
-}
+// Lecture links open YouTube directly; no embedded popup is required.
 
 // Auth Logic (Firebase Authentication)
 const authBtn = document.getElementById('auth-btn');
