@@ -310,8 +310,8 @@
         <div class="fg-row">
             <!-- CNN 공포·탐욕 지수 -->
             <div class="glass-panel fg-card">
-                <h3 class="fg-head">CNN 공포·탐욕 지수</h3>
-                <p class="fg-desc">변동성(VIX)·풋/콜 옵션 비율·안전자산 수요 등 7가지 심리 지표로 계산합니다. 0 = 극단적 공포, 100 = 극단적 탐욕</p>
+                <h3 class="fg-head">미국 시장(S&amp;P 500·SPY)의 CNN 공포·탐욕 지수</h3>
+                <p class="fg-desc">개별 종목이 아니라 <strong>미국 주식시장 전체</strong>의 투자 심리입니다. S&amp;P 500 가격 흐름·변동성(VIX)·풋/콜 옵션 비율·안전자산 수요 등 7가지 지표로 계산합니다. 0 = 극단적 공포, 100 = 극단적 탐욕</p>
                 <svg viewBox="0 -14 220 134" width="100%" style="max-width:320px;display:block;margin:0 auto" role="img" aria-label="CNN 공포·탐욕 지수 게이지" id="fg-gauge"><path d="M30.0 100.0 A80 80 0 0 1 52.0 44.9" stroke="#dc2626" stroke-width="16" fill="none" stroke-linecap="butt"/><path d="M54.9 42.0 A80 80 0 0 1 95.5 21.3" stroke="#f97316" stroke-width="16" fill="none" stroke-linecap="butt"/><path d="M99.5 20.7 A80 80 0 0 1 120.5 20.7" stroke="#94a3b8" stroke-width="16" fill="none" stroke-linecap="butt"/><path d="M124.5 21.3 A80 80 0 0 1 165.1 42.0" stroke="#4ade80" stroke-width="16" fill="none" stroke-linecap="butt"/><path d="M168.0 44.9 A80 80 0 0 1 190.0 100.0" stroke="#16a34a" stroke-width="16" fill="none" stroke-linecap="butt"/><text x="10.0" y="104.0" text-anchor="middle" font-size="10" fill="#94a3b8">0</text><text x="39.3" y="33.3" text-anchor="middle" font-size="10" fill="#94a3b8">25</text><text x="110.0" y="4.0" text-anchor="middle" font-size="10" fill="#94a3b8">50</text><text x="180.7" y="33.3" text-anchor="middle" font-size="10" fill="#94a3b8">75</text><text x="210.0" y="104.0" text-anchor="middle" font-size="10" fill="#94a3b8">100</text><g id="fg-needle" style="transform-origin:110px 100px;transform:rotate(-90deg);transition:transform .8s ease"><line x1="110" y1="100" x2="110" y2="32" stroke="#f1f5f9" stroke-width="4" stroke-linecap="round"/></g><circle cx="110" cy="100" r="7" fill="#f1f5f9"/></svg>
                 <div class="fg-score"><span id="fg-score">–</span><span id="fg-rating" class="fg-rating">불러오는 중…</span></div>
                 <ul class="fg-hist" id="fg-hist"></ul>
@@ -1017,7 +1017,7 @@
                     ratingEl.textContent = lv[1];
                     ratingEl.style.color = lv[2];
                     document.getElementById('fg-needle').style.transform = 'rotate(' + (-90 + v * 1.8) + 'deg)';
-                    document.getElementById('fg-gauge').setAttribute('aria-label', 'CNN 공포·탐욕 지수 ' + v + '점, ' + lv[1]);
+                    document.getElementById('fg-gauge').setAttribute('aria-label', '미국 시장 CNN 공포·탐욕 지수 ' + v + '점, ' + lv[1]);
                     var hist = [['전일', f.previous_close], ['1주 전', f.previous_1_week], ['1달 전', f.previous_1_month], ['1년 전', f.previous_1_year]];
                     var ul = document.getElementById('fg-hist');
                     hist.forEach(function (h) {
