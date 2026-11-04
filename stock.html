@@ -174,6 +174,20 @@
         .ta-scale { text-align: center; font-size: 0.8rem; color: #94a3b8; margin-bottom: 10px; }
         .ta-crop { overflow: hidden; }
 
+        /* CNN 공포·탐욕 지수 */
+        .fg-row { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 50px; }
+        .fg-card { flex: 1 1 340px; min-width: 0; padding: 20px; }
+        .fg-head { margin: 0 0 6px; font-size: 1.2rem; color: #f1f5f9; text-align: center; }
+        .fg-desc { margin: 0 0 14px; font-size: 0.85rem; color: #94a3b8; text-align: center; line-height: 1.6; }
+        .fg-score { display: flex; flex-direction: column; align-items: center; margin-top: 6px; }
+        #fg-score { font-size: 2.6rem; font-weight: 800; color: #f1f5f9; line-height: 1.1; font-variant-numeric: tabular-nums; }
+        .fg-rating { font-size: 1.1rem; font-weight: 700; margin-top: 2px; }
+        .fg-hist { list-style: none; margin: 18px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+        .fg-hist li { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 10px 12px; font-size: 0.85rem; color: #94a3b8; }
+        .fg-hist b { display: block; font-size: 1.05rem; color: #f1f5f9; margin-top: 2px; font-variant-numeric: tabular-nums; }
+        .fg-foot { margin: 14px 0 0; font-size: 0.8rem; color: #94a3b8; text-align: center; }
+        .fg-foot a { color: #60a5fa; }
+
         /* 종목 검색 */
         .ss-panel { padding: 20px; margin-bottom: 30px; position: relative; }
         .ss-box { display: flex; align-items: center; gap: 10px; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 12px; padding: 0 14px; color: #94a3b8; }
@@ -288,11 +302,28 @@
             SPY 하나를 사면 애플·마이크로소프트·엔비디아 같은 500개 기업에 조금씩 나눠 투자하는 효과가 있어서,
             SPY의 기술적 분석은 곧 <strong>미국 주식시장 전체의 분위기</strong>를 보여 줍니다. <br>
             <span style="color: #ef4444;">Strong Sell (공포)</span> ↔ <span style="color: #22c55e;">Strong Buy (탐욕)</span> ·
-            <span style="color: #ef4444;">셀 = 매도</span> · <span style="color: #cbd5e1;">뉴트럴 = 중립</span> · <span style="color: #22c55e;">바이 = 매수</span>
+            <span style="color: #ef4444;">셀 = 매도</span> · <span style="color: #cbd5e1;">뉴트럴 = 중립</span> · <span style="color: #22c55e;">바이 = 매수</span> <br>
+            <strong style="color: #ffd700;">읽는 법:</strong> SPY 게이지가 <span style="color: #ef4444;">셀</span> 쪽이면 가격이 이동평균선 아래로 떨어져 사람들이 팔고 있는 <strong>공포</strong>,
+            <span style="color: #22c55e;">바이</span> 쪽이면 가격이 계속 올라 너도나도 사고 있는 <strong>탐욕</strong>, 가운데는 <strong>관망</strong>으로 읽습니다.
+            단, '셀'이 '팔아라'는 뜻은 아닙니다. 공포 구간을 오히려 매수 기회로 보는 사람도 많습니다.
         </p>
-        <div class="glass-panel" style="padding: 20px; margin-bottom: 50px;">
-            <!-- 기술적 분석 위젯 (시간 탭은 아래 스크립트가 한국어로 만듦) -->
-            <div class="ta-block" data-symbol="AMEX:SPY"></div>
+        <div class="fg-row">
+            <!-- CNN 공포·탐욕 지수 -->
+            <div class="glass-panel fg-card">
+                <h3 class="fg-head">CNN 공포·탐욕 지수</h3>
+                <p class="fg-desc">변동성(VIX)·풋/콜 옵션 비율·안전자산 수요 등 7가지 심리 지표로 계산합니다. 0 = 극단적 공포, 100 = 극단적 탐욕</p>
+                <svg viewBox="0 0 220 120" width="100%" style="max-width:320px;display:block;margin:0 auto" role="img" aria-label="CNN 공포·탐욕 지수 게이지" id="fg-gauge"><path d="M30.0 100.0 A80 80 0 0 1 52.0 44.9" stroke="#dc2626" stroke-width="16" fill="none" stroke-linecap="butt"/><path d="M54.9 42.0 A80 80 0 0 1 95.5 21.3" stroke="#f97316" stroke-width="16" fill="none" stroke-linecap="butt"/><path d="M99.5 20.7 A80 80 0 0 1 120.5 20.7" stroke="#94a3b8" stroke-width="16" fill="none" stroke-linecap="butt"/><path d="M124.5 21.3 A80 80 0 0 1 165.1 42.0" stroke="#4ade80" stroke-width="16" fill="none" stroke-linecap="butt"/><path d="M168.0 44.9 A80 80 0 0 1 190.0 100.0" stroke="#16a34a" stroke-width="16" fill="none" stroke-linecap="butt"/><text x="10.0" y="104.0" text-anchor="middle" font-size="10" fill="#94a3b8">0</text><text x="39.3" y="33.3" text-anchor="middle" font-size="10" fill="#94a3b8">25</text><text x="110.0" y="4.0" text-anchor="middle" font-size="10" fill="#94a3b8">50</text><text x="180.7" y="33.3" text-anchor="middle" font-size="10" fill="#94a3b8">75</text><text x="210.0" y="104.0" text-anchor="middle" font-size="10" fill="#94a3b8">100</text><g id="fg-needle" style="transform-origin:110px 100px;transform:rotate(-90deg);transition:transform .8s ease"><line x1="110" y1="100" x2="110" y2="32" stroke="#f1f5f9" stroke-width="4" stroke-linecap="round"/></g><circle cx="110" cy="100" r="7" fill="#f1f5f9"/></svg>
+                <div class="fg-score"><span id="fg-score">–</span><span id="fg-rating" class="fg-rating">불러오는 중…</span></div>
+                <ul class="fg-hist" id="fg-hist"></ul>
+                <p class="fg-foot"><span id="fg-time"></span> · 출처: <a href="https://edition.cnn.com/markets/fear-and-greed" target="_blank" rel="noopener noreferrer">CNN</a></p>
+            </div>
+            <!-- SPY 기술적 분석 -->
+            <div class="glass-panel fg-card">
+                <h3 class="fg-head">SPY 기술적 분석</h3>
+                <p class="fg-desc">가격 추세(이동평균선·오실레이터)로 본 미국 시장의 방향입니다.</p>
+                <!-- 기술적 분석 위젯 (시간 탭은 아래 스크립트가 한국어로 만듦) -->
+                <div class="ta-block" data-symbol="AMEX:SPY"></div>
+            </div>
         </div>
 
         <!-- 알파벳 A (GOOGL) 기술적 분석 -->
@@ -970,6 +1001,44 @@
             document.getElementById('ss-close').addEventListener('click', function () { dlg.close(); });
             dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
             dlg.addEventListener('close', function () { document.getElementById('ss-dialog-body').innerHTML = ''; input.focus(); });
+        })();
+    </script>
+    <script>
+        // CNN 공포·탐욕 지수 불러오기
+        (function () {
+            var LV = [[25, '극단적 공포', '#f87171'], [45, '공포', '#fb923c'], [56, '중립', '#cbd5e1'], [76, '탐욕', '#4ade80'], [101, '극단적 탐욕', '#22c55e']];
+            function level(v) { for (var i = 0; i < LV.length; i++) if (v < LV[i][0]) return LV[i]; return LV[LV.length - 1]; }
+            var scoreEl = document.getElementById('fg-score'), ratingEl = document.getElementById('fg-rating');
+            fetch('https://production.dataviz.cnn.io/index/fearandgreed/graphdata')
+                .then(function (r) { return r.json(); })
+                .then(function (j) {
+                    var f = j.fear_and_greed, v = Math.round(f.score), lv = level(v);
+                    scoreEl.textContent = v;
+                    ratingEl.textContent = lv[1];
+                    ratingEl.style.color = lv[2];
+                    document.getElementById('fg-needle').style.transform = 'rotate(' + (-90 + v * 1.8) + 'deg)';
+                    document.getElementById('fg-gauge').setAttribute('aria-label', 'CNN 공포·탐욕 지수 ' + v + '점, ' + lv[1]);
+                    var hist = [['전일', f.previous_close], ['1주 전', f.previous_1_week], ['1달 전', f.previous_1_month], ['1년 전', f.previous_1_year]];
+                    var ul = document.getElementById('fg-hist');
+                    hist.forEach(function (h) {
+                        if (typeof h[1] !== 'number') return;
+                        var n = Math.round(h[1]), l = level(n);
+                        var li = document.createElement('li');
+                        li.textContent = h[0];
+                        var b = document.createElement('b');
+                        b.textContent = n + ' · ' + l[1];
+                        b.style.color = l[2];
+                        li.appendChild(b);
+                        ul.appendChild(li);
+                    });
+                    var t = new Date(f.timestamp);
+                    document.getElementById('fg-time').textContent = t.toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' 기준(한국 시간)';
+                })
+                .catch(function () {
+                    scoreEl.textContent = '–';
+                    ratingEl.textContent = '지금은 값을 불러오지 못했습니다';
+                    ratingEl.style.color = '#94a3b8';
+                });
         })();
     </script>
 </body>
