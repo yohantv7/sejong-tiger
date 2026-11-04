@@ -70,6 +70,11 @@ async function fromSec(ticker) {
     const j = await secJson('https://data.sec.gov/api/xbrl/companyfacts/CIK' + cik + '.json');
     const f = j.facts || {};
     const oiQ = quarterly(usd(f, 'OperatingIncomeLoss'));
+    let revQ = [];
+    for (const n of ['Revenues', 'RevenueFromContractWithCustomerExcludingAssessedTax', 'SalesRevenueNet']) {
+        const q = quarterly(usd(f, n));
+        if (q.length && oiQ.length && q[0].end === oiQ[0].end) { revQ = q; break; }
+    }
     const cash = firstInstants(f, ['CashAndCashEquivalentsAtCarryingValue', 'CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents']);
     const st = firstInstants(f, ['MarketableSecuritiesCurrent', 'ShortTermInvestments', 'AvailableForSaleSecuritiesDebtSecuritiesCurrent']);
     const ltd = firstInstants(f, ['LongTermDebt']);
@@ -88,6 +93,7 @@ async function fromSec(ticker) {
         source: 'SEC EDGAR',
         currency: 'USD',
         operatingIncome: oiQ.slice(0, 2),
+        revenue: revQ.slice(0, 2),
         netCash: bal.map((b) => ({ end: b.end, val: b.netCash, cash: b.cash, debt: b.debt }))
     };
 }
@@ -158,8 +164,10 @@ async function fromDart(stock) {
                 ['현금및현금성자산', '단기금융상품', '단기투자자산']);
             const debt = sumAccounts(list, ['ifrs-full_ShorttermBorrowings', 'ifrs-full_LongtermBorrowings', 'dart_BondsIssued', 'ifrs-full_CurrentPortionOfLongtermBorrowings', 'dart_CurrentPortionOfBonds'],
                 ['단기차입금', '장기차입금', '사채', '유동성장기부채', '유동성장기차입금', '유동성사채']);
+            const revRow = pick(list, ['IS', 'CIS'], ['ifrs-full_Revenue'], ['매출액', '수익(매출액)', '영업수익', '매출']);
             out.push({
                 end: quarterEnd(y, q), q: q, year: y,
+                rev: revRow && q !== 4 ? num(revRow.thstrm_amount) : null,
                 // 사업보고서는 연간 값만 주므로 4분기 영업이익은 비워 두고 아래에서 계산
                 oi: oiRow ? (q === 4 ? null : num(oiRow.thstrm_amount)) : null,
                 oiYear: oiRow && q === 4 ? num(oiRow.thstrm_amount) : null,
@@ -179,6 +187,7 @@ async function fromDart(stock) {
         source: 'DART',
         currency: 'KRW',
         operatingIncome: out.filter((r) => r.oi != null).slice(0, 2).map((r) => ({ end: r.end, val: r.oi })),
+        revenue: out.filter((r) => r.rev != null).slice(0, 2).map((r) => ({ end: r.end, val: r.rev })),
         netCash: out.filter((r) => r.cash != null).slice(0, 2).map((r) => ({ end: r.end, val: r.cash - (r.debt || 0), cash: r.cash, debt: r.debt || 0 }))
     };
 }

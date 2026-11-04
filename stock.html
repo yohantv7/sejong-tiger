@@ -1160,8 +1160,28 @@
                     .then(function (j) {
                         if (j.needsKey) { c1.textContent = c2.textContent = '전 분기 대비: DART 인증키 등록 후 표시됩니다'; return; }
                         if (j.unsupported || j.error) throw new Error(j.error || 'unsupported');
+                        // 공시 값이 있으면 칸의 숫자도 공시 기준으로 맞춤 (증감과 같은 기준)
+                        var oi0 = j.operatingIncome && j.operatingIncome[0];
+                        if (oi0) {
+                            t1.querySelector('.k').textContent = '영업이익 · ' + endLabel(oi0.end) + ' 분기 (' + j.source + ' 공시)';
+                            var ob = t1.querySelector('b');
+                            ob.textContent = (oi0.val < 0 ? '영업손실 ' : '') + money(Math.abs(oi0.val), j.currency);
+                            ob.style.color = oi0.val >= 0 ? '#4ade80' : '#f87171';
+                            var rv = j.revenue && j.revenue[0], sub = t1.querySelector('.s');
+                            if (sub && sub !== c1) sub.textContent = rv && rv.end === oi0.end && rv.val > 0
+                                ? '매출 ' + money(rv.val, j.currency) + ' · 영업이익률 ' + (oi0.val / rv.val * 100).toFixed(1) + '%' : '';
+                        }
+                        var nc0 = j.netCash && j.netCash[0];
+                        if (nc0) {
+                            t2.querySelector('.k').textContent = (nc0.val >= 0 ? '순현금' : '순부채') + ' · ' + endLabel(nc0.end) + ' (' + j.source + ' 공시)';
+                            var nb = t2.querySelector('b');
+                            nb.textContent = money(Math.abs(nc0.val), j.currency);
+                            nb.style.color = nc0.val >= 0 ? '#4ade80' : '#f87171';
+                            var ns = t2.querySelector('.s');
+                            if (ns && ns !== c2) ns.textContent = '현금성자산 ' + money(nc0.cash, j.currency) + ' − 차입금 ' + money(nc0.debt, j.currency);
+                        }
                         change(c1, j.operatingIncome, j.currency, j.source + ' 공시');
-                        change(c2, j.netCash, j.currency, j.source + ' 공시, 현금성자산 − 차입금');
+                        change(c2, j.netCash, j.currency, j.source + ' 공시');
                     })
                     .catch(function () { c1.textContent = c2.textContent = '전 분기 대비: 공시 자료를 불러오지 못했습니다'; });
                 // FCF(잉여현금흐름) = 영업으로 번 현금 − 설비투자. 전 분기 대비 증감 포함
