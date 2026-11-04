@@ -277,7 +277,7 @@
                 <button type="button" class="ss-close" id="ss-close" aria-label="닫기">&times;</button>
             </div>
             <div id="ss-dialog-body" class="ss-dialog-body"></div>
-            <p class="ss-legend"><span style="color: #f87171;">셀 = 매도</span> · 뉴트럴 = 중립 · <span style="color: #60a5fa;">바이 = 매수</span></p>
+            <p class="ss-legend"><span style="color: #f87171;">셀 = 매도</span> · 뉴트럴 = 중립 · <span style="color: #60a5fa;">바이 = 매수</span> · 스트롱 = 강한</p>
         </dialog>
 
         <!-- 2. Market Sentiment (Fear & Greed) -->
@@ -919,6 +919,11 @@
                 var local = KO_US.filter(function (r) { return norm(r[0]).indexOf(nq) === 0 || (nq.length >= 2 && norm(r[0]).indexOf(nq) >= 0); })
                     .map(function (r) { return { symbol: r[1], code: r[1].split(':')[1], name: r[0] + ' · ' + r[2], ex: r[1].split(':')[0] }; });
                 var jobs = hasHangul(q) ? [scan('korea', q, 'ko')] : [scan('america', q), scan('korea', q, 'ko')];
+                // "삼성전자우"처럼 흔히 쓰는 우선주 이름 → TradingView 표기("삼성전자1우선주")도 함께 검색
+                var pref = hasHangul(q) && /우$/.test(nq) && nq.length >= 3;
+                if (pref) jobs.unshift(scan('korea', nq.slice(0, -1), 'ko').then(function (r) {
+                    return r.filter(function (x) { return x.name.indexOf('우선주') >= 0 || /우$/.test(x.name); });
+                }));
                 status.textContent = '검색 중…';
                 Promise.all(jobs).then(function (res) {
                     if (my !== seq) return;
