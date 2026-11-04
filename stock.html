@@ -167,6 +167,12 @@
         .ta-tabs button:hover { color: #fff; background: rgba(255, 255, 255, 0.06); }
         .ta-tabs button[aria-selected="true"] { color: #fff; font-weight: 700; background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.15); }
         .ta-tabs button:focus-visible { outline: 2px solid #ffd700; outline-offset: 2px; }
+        .ta-title { text-align: center; font-size: 1.15rem; font-weight: 600; color: #e2e8f0; margin: 4px 0 4px; line-height: 1.5; }
+        .ta-title .sym { color: #60a5fa; }
+        .ta-title .val { display: inline-block; margin-left: 8px; font-weight: 800; font-variant-numeric: tabular-nums; }
+        .ta-title .val.sell { color: #f87171; } .ta-title .val.buy { color: #60a5fa; } .ta-title .val.neutral { color: #cbd5e1; }
+        .ta-scale { text-align: center; font-size: 0.8rem; color: #94a3b8; margin-bottom: 10px; }
+        .ta-crop { overflow: hidden; }
     </style>
 </head>
 
@@ -694,6 +700,7 @@
     <script>
         // TradingView 기술적 분석 위젯: 위젯 자체 시간 탭("1 날" 표기)을 숨기고 한국어 탭을 직접 만듦
         (function () {
+            var TITLE_CROP = 56; // 위젯 자체 제목 높이(px) — 가려서 새 제목으로 대체
             var INTERVALS = [['1m', '1분'], ['5m', '5분'], ['15m', '15분'], ['30m', '30분'], ['1h', '1시간'],
                 ['2h', '2시간'], ['4h', '4시간'], ['1D', '1일'], ['1W', '1주'], ['1M', '1달']];
             function draw(host, symbol, interval) {
@@ -712,10 +719,55 @@
                     symbol: symbol, showIntervalTabs: false, displayMode: 'single', locale: 'kr', colorTheme: 'dark'
                 });
                 box.appendChild(sc);
-                host.appendChild(box);
+                var crop = document.createElement('div');
+                crop.className = 'ta-crop';
+                crop.style.height = (360 - TITLE_CROP) + 'px';
+                box.style.marginTop = (-TITLE_CROP) + 'px';
+                crop.appendChild(box);
+                host.appendChild(crop);
+            }
+            // 점수(−1 ~ +1)를 TradingView에서 받아와 제목 뒤에 표시
+            var SUFFIX = { '1m': '|1', '5m': '|5', '15m': '|15', '30m': '|30', '1h': '|60', '2h': '|120', '4h': '|240', '1D': '', '1W': '|1W', '1M': '|1M' };
+            function grade(v) {
+                if (v > 0.5) return ['강한 매수', 'buy'];
+                if (v > 0.1) return ['매수', 'buy'];
+                if (v >= -0.1) return ['중립', 'neutral'];
+                if (v >= -0.5) return ['매도', 'sell'];
+                return ['강한 매도', 'sell'];
+            }
+            function score(valEl, symbol, interval) {
+                valEl.textContent = '…';
+                valEl.className = 'val neutral';
+                var market = symbol.indexOf('KRX:') === 0 ? 'korea' : 'america';
+                fetch('https://scanner.tradingview.com/' + market + '/scan', {
+                    method: 'POST',
+                    body: JSON.stringify({ symbols: { tickers: [symbol], query: { types: [] } }, columns: ['Recommend.All' + SUFFIX[interval]] })
+                }).then(function (r) { return r.json(); }).then(function (j) {
+                    var v = j && j.data && j.data[0] && j.data[0].d[0];
+                    if (typeof v !== 'number') throw new Error('no value');
+                    var g = grade(v);
+                    valEl.textContent = (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(2) + ' (' + g[0] + ')';
+                    valEl.className = 'val ' + g[1];
+                }).catch(function () { valEl.textContent = ''; });
             }
             document.querySelectorAll('.ta-block').forEach(function (block) {
                 var symbol = block.dataset.symbol;
+                var name = symbol.split(':')[1];
+                var title = document.createElement('div');
+                title.className = 'ta-title';
+                var sym = document.createElement('span');
+                sym.className = 'sym';
+                sym.textContent = name;
+                var val = document.createElement('span');
+                val.setAttribute('aria-live', 'polite');
+                title.appendChild(sym);
+                title.appendChild(document.createTextNode(' 에 대한 테크니컬 어낼리시스'));
+                title.appendChild(val);
+                var scale = document.createElement('div');
+                scale.className = 'ta-scale';
+                scale.textContent = '점수: −1 강한 매도 · 0 중립 · +1 강한 매수';
+                block.appendChild(title);
+                block.appendChild(scale);
                 var tabs = document.createElement('div');
                 tabs.className = 'ta-tabs';
                 tabs.setAttribute('role', 'tablist');
@@ -733,10 +785,12 @@
                         tabs.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-selected', 'false'); });
                         b.setAttribute('aria-selected', 'true');
                         draw(host, symbol, iv[0]);
+                        score(val, symbol, iv[0]);
                     });
                     tabs.appendChild(b);
                 });
                 draw(host, symbol, '1D');
+                score(val, symbol, '1D');
             });
         })();
     </script>
