@@ -173,6 +173,32 @@
         .ta-title .val.sell { color: #f87171; } .ta-title .val.buy { color: #60a5fa; } .ta-title .val.neutral { color: #cbd5e1; }
         .ta-scale { text-align: center; font-size: 0.8rem; color: #94a3b8; margin-bottom: 10px; }
         .ta-crop { overflow: hidden; }
+
+        /* 종목 검색 */
+        .ss-panel { padding: 20px; margin-bottom: 30px; position: relative; }
+        .ss-box { display: flex; align-items: center; gap: 10px; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 12px; padding: 0 14px; color: #94a3b8; }
+        .ss-box:focus-within { border-color: #ffd700; box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.15); }
+        .ss-box input { flex: 1; min-width: 0; background: transparent; border: 0; outline: none; color: #f1f5f9; font-size: 1.05rem; min-height: 52px; font-family: inherit; }
+        .ss-box input::placeholder { color: #94a3b8; }
+        .ss-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+        .ss-results { list-style: none; margin: 10px 0 0; padding: 0; max-height: 360px; overflow-y: auto; }
+        .ss-results:empty { display: none; }
+        .ss-results li { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 10px; cursor: pointer; color: #e2e8f0; }
+        .ss-results li[aria-selected="true"], .ss-results li:hover { background: rgba(255, 255, 255, 0.08); }
+        .ss-results .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .ss-results .cd { color: #60a5fa; font-weight: 700; font-variant-numeric: tabular-nums; }
+        .ss-results .ex { font-size: 0.8rem; color: #94a3b8; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 6px; padding: 2px 6px; }
+        .ss-status { margin: 8px 4px 0; font-size: 0.9rem; color: #94a3b8; }
+        .ss-status:empty { display: none; }
+        .ss-dialog { width: min(640px, calc(100% - 24px)); max-height: calc(100% - 24px); padding: 0; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 16px; background: #0f172a; color: #f1f5f9; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); }
+        .ss-dialog::backdrop { background: rgba(2, 6, 23, 0.7); backdrop-filter: blur(4px); }
+        .ss-dialog-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 18px 20px 6px; }
+        .ss-dialog-head h3 { margin: 0; font-size: 1.3rem; }
+        .ss-dialog-head p { margin: 4px 0 0; color: #94a3b8; font-size: 0.9rem; }
+        .ss-close { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: #f1f5f9; font-size: 1.5rem; line-height: 1; min-width: 44px; min-height: 44px; border-radius: 10px; cursor: pointer; }
+        .ss-close:hover { background: rgba(255, 255, 255, 0.15); }
+        .ss-dialog-body { padding: 4px 16px 0; }
+        .ss-legend { text-align: center; font-size: 0.85rem; color: #cbd5e1; margin: 4px 0 18px; }
     </style>
 </head>
 
@@ -226,6 +252,34 @@
     </div>
 
     <div class="container">
+        <!-- 종목 검색 → 기술적 분석 팝업 -->
+        <h2 class="section-title">종목 검색 · 기술적 분석 🔎</h2>
+        <p style="color: #cbd5e1; margin-bottom: 16px;">
+            한국 종목은 <strong>한글 이름이나 종목 코드</strong>(예: 삼성전자, 005930), 미국 종목은 <strong>영문 이름이나 티커</strong>(예: apple, AAPL)로 찾을 수 있습니다.
+            애플·테슬라 같은 자주 찾는 미국 종목은 한글로도 검색됩니다.
+        </p>
+        <div class="glass-panel ss-panel">
+            <div class="ss-box" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-owns="ss-results">
+                <label for="ss-input" class="ss-sr">종목 검색</label>
+                <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+                <input id="ss-input" type="search" autocomplete="off" placeholder="종목 이름 또는 코드 입력 (예: 삼성전자우, 테슬라, NVDA)" aria-autocomplete="list" aria-controls="ss-results">
+            </div>
+            <ul id="ss-results" class="ss-results" role="listbox" aria-label="검색 결과"></ul>
+            <p id="ss-status" class="ss-status" aria-live="polite"></p>
+        </div>
+
+        <dialog id="ss-dialog" class="ss-dialog" aria-labelledby="ss-dialog-title">
+            <div class="ss-dialog-head">
+                <div>
+                    <h3 id="ss-dialog-title"></h3>
+                    <p id="ss-dialog-sub"></p>
+                </div>
+                <button type="button" class="ss-close" id="ss-close" aria-label="닫기">&times;</button>
+            </div>
+            <div id="ss-dialog-body" class="ss-dialog-body"></div>
+            <p class="ss-legend"><span style="color: #f87171;">셀 = 매도</span> · 뉴트럴 = 중립 · <span style="color: #60a5fa;">바이 = 매수</span></p>
+        </dialog>
+
         <!-- 2. Market Sentiment (Fear & Greed) -->
         <h2 class="section-title">시장 심리 (공포 vs 탐욕) 😨🤑</h2>
         <p style="color: #cbd5e1; margin-bottom: 20px;">
@@ -750,7 +804,7 @@
                     valEl.className = 'val ' + g[1];
                 }).catch(function () { valEl.textContent = ''; });
             }
-            document.querySelectorAll('.ta-block').forEach(function (block) {
+            function initTA(block) {
                 var symbol = block.dataset.symbol;
                 var name = symbol.split(':')[1];
                 var title = document.createElement('div');
@@ -791,7 +845,122 @@
                 });
                 draw(host, symbol, '1D');
                 score(val, symbol, '1D');
+            }
+            window.initTA = initTA;
+            document.querySelectorAll('.ta-block').forEach(initTA);
+        })();
+    </script>
+    <script>
+        // 종목 검색 → 팝업으로 기술적 분석 표시 (TradingView 스캐너 검색 사용)
+        (function () {
+            var input = document.getElementById('ss-input');
+            var list = document.getElementById('ss-results');
+            var box = input.closest('.ss-box');
+            var status = document.getElementById('ss-status');
+            var dlg = document.getElementById('ss-dialog');
+            // 미국 종목 한글 이름 → TradingView 심볼
+            var KO_US = [
+                ['애플', 'NASDAQ:AAPL', 'Apple Inc.'], ['마이크로소프트', 'NASDAQ:MSFT', 'Microsoft Corp.'], ['엔비디아', 'NASDAQ:NVDA', 'NVIDIA Corp.'],
+                ['알파벳A', 'NASDAQ:GOOGL', 'Alphabet Inc. Class A'], ['구글', 'NASDAQ:GOOGL', 'Alphabet Inc. Class A'], ['알파벳C', 'NASDAQ:GOOG', 'Alphabet Inc. Class C'],
+                ['아마존', 'NASDAQ:AMZN', 'Amazon.com Inc.'], ['메타', 'NASDAQ:META', 'Meta Platforms Inc.'], ['테슬라', 'NASDAQ:TSLA', 'Tesla Inc.'],
+                ['브로드컴', 'NASDAQ:AVGO', 'Broadcom Inc.'], ['넷플릭스', 'NASDAQ:NFLX', 'Netflix Inc.'], ['팔란티어', 'NASDAQ:PLTR', 'Palantir Technologies'],
+                ['AMD', 'NASDAQ:AMD', 'Advanced Micro Devices'], ['인텔', 'NASDAQ:INTC', 'Intel Corp.'], ['퀄컴', 'NASDAQ:QCOM', 'Qualcomm Inc.'],
+                ['마이크론', 'NASDAQ:MU', 'Micron Technology'], ['코스트코', 'NASDAQ:COST', 'Costco Wholesale'], ['스타벅스', 'NASDAQ:SBUX', 'Starbucks Corp.'],
+                ['펩시', 'NASDAQ:PEP', 'PepsiCo Inc.'], ['버크셔해서웨이', 'NYSE:BRK.B', 'Berkshire Hathaway B'], ['코카콜라', 'NYSE:KO', 'Coca-Cola Co.'],
+                ['TSMC', 'NYSE:TSM', 'Taiwan Semiconductor (ADR)'], ['일라이릴리', 'NYSE:LLY', 'Eli Lilly and Co.'], ['비자', 'NYSE:V', 'Visa Inc.'],
+                ['마스터카드', 'NYSE:MA', 'Mastercard Inc.'], ['제이피모건', 'NYSE:JPM', 'JPMorgan Chase & Co.'], ['월마트', 'NYSE:WMT', 'Walmart Inc.'],
+                ['오라클', 'NYSE:ORCL', 'Oracle Corp.'], ['디즈니', 'NYSE:DIS', 'Walt Disney Co.'], ['나이키', 'NYSE:NKE', 'Nike Inc.'],
+                ['맥도날드', 'NYSE:MCD', "McDonald's Corp."], ['존슨앤존슨', 'NYSE:JNJ', 'Johnson & Johnson'], ['엑슨모빌', 'NYSE:XOM', 'Exxon Mobil Corp.'],
+                ['셰브론', 'NYSE:CVX', 'Chevron Corp.'], ['뱅크오브아메리카', 'NYSE:BAC', 'Bank of America'], ['아이온큐', 'NYSE:IONQ', 'IonQ Inc.'],
+                ['SPY', 'AMEX:SPY', 'SPDR S&P 500 ETF Trust'], ['QQQ', 'NASDAQ:QQQ', 'Invesco QQQ Trust'], ['슈드', 'AMEX:SCHD', 'Schwab US Dividend Equity ETF']
+            ];
+            var hasHangul = function (t) { return /[ㄱ-힝]/.test(t); };
+            var norm = function (t) { return t.replace(/\s+/g, '').toLowerCase(); };
+
+            function scan(market, q, lang) {
+                var body = {
+                    filter: [{ left: 'name,description', operation: 'match', right: q }],
+                    columns: ['name', 'description', 'exchange', 'type'],
+                    sort: { sortBy: 'market_cap_basic', sortOrder: 'desc' },
+                    range: [0, 8]
+                };
+                if (lang) body.options = { lang: lang };
+                return fetch('https://scanner.tradingview.com/' + market + '/scan', { method: 'POST', body: JSON.stringify(body) })
+                    .then(function (r) { return r.json(); })
+                    .then(function (j) {
+                        return (j.data || []).filter(function (x) { return x.d[3] === 'stock' || x.d[3] === 'fund' || x.d[3] === 'dr'; })
+                            .map(function (x) { return { symbol: x.s, code: x.d[0], name: x.d[1], ex: x.d[2] }; });
+                    })
+                    .catch(function () { return []; });
+            }
+
+            var active = -1, items = [], seq = 0, timer = null;
+            function render() {
+                list.innerHTML = '';
+                items.forEach(function (it, i) {
+                    var li = document.createElement('li');
+                    li.id = 'ss-opt-' + i;
+                    li.setAttribute('role', 'option');
+                    li.setAttribute('aria-selected', i === active ? 'true' : 'false');
+                    var cd = document.createElement('span'); cd.className = 'cd'; cd.textContent = it.code;
+                    var nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = it.name;
+                    var ex = document.createElement('span'); ex.className = 'ex'; ex.textContent = it.ex;
+                    li.append(cd, nm, ex);
+                    li.addEventListener('mousedown', function (e) { e.preventDefault(); open(it); });
+                    list.appendChild(li);
+                });
+                box.setAttribute('aria-expanded', items.length ? 'true' : 'false');
+                if (active >= 0) input.setAttribute('aria-activedescendant', 'ss-opt-' + active); else input.removeAttribute('aria-activedescendant');
+            }
+
+            function search(q) {
+                var my = ++seq;
+                var nq = norm(q);
+                var local = KO_US.filter(function (r) { return norm(r[0]).indexOf(nq) === 0 || (nq.length >= 2 && norm(r[0]).indexOf(nq) >= 0); })
+                    .map(function (r) { return { symbol: r[1], code: r[1].split(':')[1], name: r[0] + ' · ' + r[2], ex: r[1].split(':')[0] }; });
+                var jobs = hasHangul(q) ? [scan('korea', q, 'ko')] : [scan('america', q), scan('korea', q, 'ko')];
+                status.textContent = '검색 중…';
+                Promise.all(jobs).then(function (res) {
+                    if (my !== seq) return;
+                    var seen = {}, out = [];
+                    local.concat.apply(local, res).forEach(function (it) { if (!seen[it.symbol]) { seen[it.symbol] = 1; out.push(it); } });
+                    items = out.slice(0, 12);
+                    active = items.length ? 0 : -1;
+                    render();
+                    status.textContent = items.length ? '' : '검색 결과가 없습니다. 한국 종목은 한글 이름·코드, 미국 종목은 영문 이름·티커로 찾아보세요.';
+                });
+            }
+
+            input.addEventListener('input', function () {
+                clearTimeout(timer);
+                var q = input.value.trim();
+                if (!q) { seq++; items = []; active = -1; render(); status.textContent = ''; return; }
+                timer = setTimeout(function () { search(q); }, 250);
             });
+            input.addEventListener('keydown', function (e) {
+                if (!items.length) return;
+                if (e.key === 'ArrowDown') { e.preventDefault(); active = (active + 1) % items.length; render(); scrollActive(); }
+                else if (e.key === 'ArrowUp') { e.preventDefault(); active = (active - 1 + items.length) % items.length; render(); scrollActive(); }
+                else if (e.key === 'Enter') { e.preventDefault(); if (active >= 0) open(items[active]); }
+                else if (e.key === 'Escape') { items = []; active = -1; render(); }
+            });
+            function scrollActive() { var el = document.getElementById('ss-opt-' + active); if (el) el.scrollIntoView({ block: 'nearest' }); }
+
+            function open(it) {
+                document.getElementById('ss-dialog-title').textContent = it.name;
+                document.getElementById('ss-dialog-sub').textContent = it.ex + ' · ' + it.code;
+                var body = document.getElementById('ss-dialog-body');
+                body.innerHTML = '';
+                var block = document.createElement('div');
+                block.className = 'ta-block';
+                block.dataset.symbol = it.symbol;
+                body.appendChild(block);
+                dlg.showModal();
+                if (window.initTA) window.initTA(block);
+            }
+            document.getElementById('ss-close').addEventListener('click', function () { dlg.close(); });
+            dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
+            dlg.addEventListener('close', function () { document.getElementById('ss-dialog-body').innerHTML = ''; input.focus(); });
         })();
     </script>
 </body>
