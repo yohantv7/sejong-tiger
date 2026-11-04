@@ -33,10 +33,10 @@
                 <span class="logo-text">세종호랑이</span>
             </a>
             <nav class="cell menu" aria-label="주 메뉴">
-                <a href="stock.html">주식정보</a>
-                <a href="senior.html">시니어생활</a>
-                <a href="marketing.html">마케팅</a>
-                <a class="coupang" href="https://link.coupang.com/a/bXSj4l" target="_blank" rel="noopener sponsored">
+                <a class="menu-btn" href="stock.html">주식정보</a>
+                <a class="menu-btn" href="senior.html">시니어생활</a>
+                <a class="menu-btn" href="marketing.html">마케팅</a>
+                <a class="menu-btn coupang" href="https://link.coupang.com/a/bXSj4l" target="_blank" rel="noopener sponsored">
                     <img src="coupang_logo.png" alt="쿠팡 홈으로 가기">
                 </a>
                 <div class="auth-cell auth-wrapper">
@@ -49,9 +49,12 @@
         <!-- ② 카테고리 + 메인(빨강) -->
         <div class="m-row">
             <div class="m-col cats">
-                <a class="cell cat" href="stock.html"><span class="num">01</span><strong>주식정보</strong><span class="muted">미국·한국 고수의 포트폴리오</span></a>
-                <a class="cell cat" href="senior.html"><span class="num">02</span><strong>시니어생활</strong><span class="muted">여유롭고 건강한 하루</span></a>
-                <a class="cell cat" href="marketing.html"><span class="num">03</span><strong>마케팅</strong><span class="muted">실전 홍보 노하우</span></a>
+                <div class="cell cat"><span class="num">01</span><strong>주식정보</strong><span class="muted">미국·한국 고수의 포트폴리오</span>
+                    <a class="btn btn-sm" href="stock.html">바로가기 <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+                <div class="cell cat"><span class="num">02</span><strong>시니어생활</strong><span class="muted">여유롭고 건강한 하루</span>
+                    <a class="btn btn-sm" href="senior.html">바로가기 <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+                <div class="cell cat"><span class="num">03</span><strong>마케팅</strong><span class="muted">실전 홍보 노하우</span>
+                    <a class="btn btn-sm" href="marketing.html">바로가기 <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
             </div>
             <section class="cell red hero">
                 <p class="eyebrow">Stock &amp; Daily Life</p>
@@ -78,8 +81,8 @@
                 <!-- 관리자에게만 보임 (script.js가 .admin-daily-editor 표시 여부를 제어) -->
                 <div class="admin-daily-editor" style="display:none; flex:1;">
                     <label class="drop" for="daily-img-upload-1" id="daily-drop" tabindex="0">
-                        <svg aria-hidden="true" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 16V4M7 9l5-5 5 5M4 16v4h16v-4"/></svg>
-                        사진 선택 또는 끌어놓기
+                        <span>여기에 사진을 끌어놓거나</span>
+                        <span class="btn"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4M7 9l5-5 5 5M4 16v4h16v-4"/></svg>사진 선택</span>
                     </label>
                     <input class="sr-only" id="daily-img-upload-1" type="file" accept="image/*">
                 </div>
@@ -187,11 +190,11 @@
         <footer class="m-row">
             <div class="cell partners">
                 <span class="eyebrow">Partners</span>
-                <a href="https://lpweb.kr/click.php?m=kbbook&a=A100701605&l=0000" target="_blank" rel="noopener sponsored">교보문고</a>
-                <a href="https://linkmoa.kr/click.php?m=yes24&a=A100701605&l=0000" target="_blank" rel="noopener sponsored">YES24</a>
-                <a href="https://linkmoa.kr/click.php?m=usimsa&a=A100701605&l=0000" target="_blank" rel="noopener sponsored">USIMSA</a>
-                <a href="https://lase.kr/click.php?m=yanolja&a=A100701605&l=0000" target="_blank" rel="noopener sponsored">야놀자</a>
-                <a href="https://link.coupang.com/a/bXSj4l" target="_blank" rel="noopener sponsored">쿠팡</a>
+                <a class="chip" href="https://lpweb.kr/click.php?m=kbbook&a=A100701605&l=0000" target="_blank" rel="noopener sponsored">교보문고</a>
+                <a class="chip" href="https://linkmoa.kr/click.php?m=yes24&a=A100701605&l=0000" target="_blank" rel="noopener sponsored">YES24</a>
+                <a class="chip" href="https://linkmoa.kr/click.php?m=usimsa&a=A100701605&l=0000" target="_blank" rel="noopener sponsored">USIMSA</a>
+                <a class="chip" href="https://lase.kr/click.php?m=yanolja&a=A100701605&l=0000" target="_blank" rel="noopener sponsored">야놀자</a>
+                <a class="chip" href="https://link.coupang.com/a/bXSj4l" target="_blank" rel="noopener sponsored">쿠팡</a>
             </div>
             <div class="cell blue spacer" aria-hidden="true"></div>
             <div class="cell disclosure partners-footer">
