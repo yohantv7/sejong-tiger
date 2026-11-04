@@ -87,8 +87,29 @@ h1, h2, h3, h4, p { margin: 0; }
 .logo-text { font-weight: 700; font-size: 22px; letter-spacing: .02em; }
 .menu { flex: 3 1 640px; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 16px; padding: 20px 28px; }
 .menu-btn { font-size: 15px; }
-.menu .coupang { padding: 0 14px; }
-.menu .coupang img { height: 24px; display: block; }
+.menu-btn[aria-expanded="true"] { background: var(--fill-yellow-strong); }
+.menu-btn[aria-expanded="true"]::after { content: ""; display: inline-block; margin-left: 2px; border: 5px solid transparent; border-top-color: currentColor; transform: translateY(3px) rotate(180deg); }
+.menu-btn[data-menu][aria-expanded="false"]::after { content: ""; display: inline-block; margin-left: 2px; border: 5px solid transparent; border-top-color: currentColor; transform: translateY(3px); }
+
+/* 하위 목록 패널 (finetnc.co.kr처럼 모든 메뉴의 하위 항목을 한 번에 보여 줌) */
+.mega { padding: 28px 32px 32px; }
+.mega[hidden] { display: none; }
+.mega-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 20px 24px; }
+.mega-col { border-radius: 8px; padding: 14px 16px 16px; transition: background-color .15s ease; }
+.mega-col.is-active { background: var(--fill-yellow); box-shadow: inset 0 0 0 2px var(--ink); }
+.mega-col h2 { font-size: 17px; margin: 0 0 10px; padding-bottom: 8px; border-bottom: 2px solid var(--ink); }
+.mega-empty { font-size: 14px; color: var(--ink-soft); margin: 6px 0 0; }
+/* 트리 구조 */
+.tree { list-style: none; margin: 4px 0 0 6px; padding: 0 0 0 16px; border-left: 2px solid rgba(28, 27, 24, .45); }
+.tree li { position: relative; padding: 4px 0; }
+.tree li::before { content: ""; position: absolute; left: -16px; top: 50%; width: 12px; border-top: 2px solid rgba(28, 27, 24, .45); }
+.tree li:last-child::after { content: ""; position: absolute; left: -18px; top: calc(50% + 2px); bottom: 0; width: 4px; background: var(--base); }
+.mega-col.is-active .tree li:last-child::after { background: linear-gradient(rgba(var(--yellow), var(--color-alpha)), rgba(var(--yellow), var(--color-alpha))), var(--base); }
+.tree a, .tree .soon { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; font-size: 15px; font-weight: 500; }
+.tree a { text-decoration: underline; text-decoration-color: rgba(28, 27, 24, .3); text-underline-offset: 4px; }
+.tree a:hover { text-decoration-color: var(--ink); }
+.tree .soon { color: var(--ink-soft); }
+.tree .soon em { font-style: normal; font-size: 12px; border: 1px solid rgba(28, 27, 24, .4); border-radius: 999px; padding: 1px 8px; }
 .menu .auth-cell { margin-left: auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px 12px; }
 #user-info { font-size: 13px; color: var(--ink-soft); }
 #user-info:empty { display: none; }
@@ -203,4 +224,6 @@ h1, h2, h3, h4, p { margin: 0; }
   .logo { min-height: 64px; }
   .menu { padding: 16px 20px; gap: 10px; }
   .menu .auth-cell { margin-left: 0; width: 100%; justify-content: flex-start; }
+  .mega { padding: 18px 20px 22px; }
+  .mega-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
 }

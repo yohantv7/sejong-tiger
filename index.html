@@ -33,12 +33,11 @@
                 <span class="logo-text">세종호랑이</span>
             </a>
             <nav class="cell menu" aria-label="주 메뉴">
-                <a class="menu-btn" href="stock.html">주식정보</a>
-                <a class="menu-btn" href="senior.html">시니어생활</a>
-                <a class="menu-btn" href="marketing.html">마케팅</a>
-                <a class="menu-btn coupang" href="https://link.coupang.com/a/bXSj4l" target="_blank" rel="noopener sponsored">
-                    <img src="coupang_logo.png" alt="쿠팡 홈으로 가기">
-                </a>
+                <button type="button" class="menu-btn" data-menu="saas" aria-expanded="false" aria-controls="mega">SAAS</button>
+                <button type="button" class="menu-btn" data-menu="home" aria-expanded="false" aria-controls="mega">홈페이지</button>
+                <button type="button" class="menu-btn" data-menu="shop" aria-expanded="false" aria-controls="mega">쇼핑몰</button>
+                <button type="button" class="menu-btn" data-menu="platform" aria-expanded="false" aria-controls="mega">플랫폼</button>
+                <button type="button" class="menu-btn" data-menu="etc" aria-expanded="false" aria-controls="mega">기타</button>
                 <div class="auth-cell auth-wrapper">
                     <span id="user-info"></span>
                     <button id="auth-btn" type="button">로그인</button>
@@ -46,6 +45,41 @@
                 </div>
             </nav>
         </header>
+
+        <!-- 메뉴를 누르면 펼쳐지는 하위 목록 (finetnc.co.kr 구조 참고) -->
+        <div class="cell mega" id="mega" hidden>
+            <div class="mega-grid">
+                <section class="mega-col" data-col="saas">
+                    <h2>SAAS</h2>
+                    <ul class="tree">
+                        <li><a href="https://id-photo-helper.vercel.app" target="_blank" rel="noopener noreferrer">증명사진 만들기<svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 17L17 7M9 7h8v8"/></svg></a></li>
+                        <li><span class="soon">어린이집용 알림장 <em>준비 중</em></span></li>
+                        <li><a href="https://clientflow-team.vercel.app" target="_blank" rel="noopener noreferrer">업무관리기<svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 17L17 7M9 7h8v8"/></svg></a></li>
+                    </ul>
+                </section>
+                <section class="mega-col" data-col="home">
+                    <h2>홈페이지</h2>
+                    <p class="mega-empty">준비 중입니다</p>
+                </section>
+                <section class="mega-col" data-col="shop">
+                    <h2>쇼핑몰</h2>
+                    <p class="mega-empty">준비 중입니다</p>
+                </section>
+                <section class="mega-col" data-col="platform">
+                    <h2>플랫폼</h2>
+                    <p class="mega-empty">준비 중입니다</p>
+                </section>
+                <section class="mega-col" data-col="etc">
+                    <h2>기타</h2>
+                    <ul class="tree">
+                        <li><a href="stock.html">주식정보</a></li>
+                        <li><a href="senior.html">시니어생활</a></li>
+                        <li><a href="marketing.html">마케팅</a></li>
+                        <li><a href="https://link.coupang.com/a/bXSj4l" target="_blank" rel="noopener sponsored">쿠팡<svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 17L17 7M9 7h8v8"/></svg></a></li>
+                    </ul>
+                </section>
+            </div>
+        </div>
 
         <!-- ② 메인(빨강) -->
         <div class="m-row">
@@ -285,6 +319,40 @@
             });
             document.addEventListener('keydown', function (e) {
                 if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.active').forEach(function (m) { m.classList.remove('active'); });
+            });
+        })();
+
+        // 상단 메뉴: 누르면 하위 목록 패널을 펼치고, 누른 메뉴의 칸을 강조
+        (function () {
+            const panel = document.getElementById('mega');
+            const btns = document.querySelectorAll('.menu-btn[data-menu]');
+            if (!panel) return;
+            let current = null;
+            function close() {
+                panel.hidden = true; current = null;
+                btns.forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
+                panel.querySelectorAll('.mega-col').forEach(function (c) { c.classList.remove('is-active'); });
+            }
+            function open(key) {
+                panel.hidden = false; current = key;
+                btns.forEach(function (b) { b.setAttribute('aria-expanded', b.dataset.menu === key ? 'true' : 'false'); });
+                panel.querySelectorAll('.mega-col').forEach(function (c) { c.classList.toggle('is-active', c.dataset.col === key); });
+                const col = panel.querySelector('.mega-col[data-col="' + key + '"]');
+                const first = col && col.querySelector('a');
+                if (window.matchMedia('(max-width: 720px)').matches && col) col.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                return first;
+            }
+            btns.forEach(function (b) {
+                b.addEventListener('click', function () { current === b.dataset.menu ? close() : open(b.dataset.menu); });
+            });
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && current) {
+                    const b = document.querySelector('.menu-btn[data-menu="' + current + '"]');
+                    close(); if (b) b.focus();
+                }
+            });
+            document.addEventListener('click', function (e) {
+                if (current && !panel.contains(e.target) && !e.target.closest('.menu-btn[data-menu]')) close();
             });
         })();
 
