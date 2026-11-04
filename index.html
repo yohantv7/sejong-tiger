@@ -361,7 +361,7 @@
                 var score = Math.round(parts.reduce(function (a, v) { return a + Math.round(clamp(v)); }, 0) / parts.length);
                 var label = LV.filter(function (l) { return score < l[0]; })[0][1];
                 document.getElementById('cat-fg-score').textContent = score;
-                document.getElementById('cat-fg-rate').textContent = '삼성전자우 공포·탐욕 · ' + label;
+                document.getElementById('cat-fg-rate').textContent = '삼성전자우 공포·탐욕 지수';
                 document.getElementById('cat-fg-needle').style.transform = 'rotate(' + (-90 + score * 1.8) + 'deg)';
                 var cell = document.querySelector('.cat-fg');
                 if (cell) cell.setAttribute('title', '배경: 삼성전자우 공포·탐욕 지수 ' + score + '점(' + label + '), 세종호랑이 자체 지표');
