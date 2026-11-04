@@ -201,6 +201,14 @@
         .sfg summary { cursor: pointer; color: #94a3b8; min-height: 32px; display: flex; align-items: center; justify-content: center; }
         .sfg details ul { margin: 6px 0 0; padding-left: 18px; line-height: 1.8; }
         .sfg-note { margin: 12px 0 0; font-size: 0.8rem; color: #94a3b8; text-align: center; line-height: 1.6; }
+        .sfg-fund { margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+        .sfg-fund h4 { margin: 0 0 10px; font-size: 1rem; color: #ffd700; text-align: center; }
+        .sfg-fund-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+        .sfg-tile { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; }
+        .sfg-tile .k { font-size: 0.8rem; color: #94a3b8; }
+        .sfg-tile b { font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+        .sfg-tile .s { font-size: 0.78rem; color: #cbd5e1; }
+        .sfg-fund-note { margin: 10px 0 0; font-size: 0.8rem; color: #cbd5e1; text-align: center; line-height: 1.6; }
         .sfg-in-popup { border-top: 1px solid rgba(255, 255, 255, 0.1); margin-top: 8px; padding: 18px 4px 6px; }
 
         /* 종목 검색 */
@@ -1088,7 +1096,54 @@
             function clamp(x) { return Math.max(0, Math.min(100, x)); }
             function pct(x) { return (x > 0 ? '+' : '') + x.toFixed(1) + '%'; }
             function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
-            var COLS = ['close', 'RSI', 'Stoch.K', 'price_52_week_high', 'price_52_week_low', 'SMA50', 'Perf.1M'];
+            var COLS = ['close', 'RSI', 'Stoch.K', 'price_52_week_high', 'price_52_week_low', 'SMA50', 'Perf.1M',
+                'type', 'fundamental_currency_code', 'fiscal_period_current', 'oper_income_fq', 'total_revenue_fq', 'net_debt_fq', 'net_debt_fy'];
+            // 금액을 조·억 단위로 (원화는 '원', 그 밖은 '달러')
+            function money(v, cur) {
+                var unit = cur === 'KRW' ? '원' : cur === 'USD' ? ' 달러' : ' ' + cur;
+                var a = Math.abs(v), sign = v < 0 ? '−' : '';
+                if (a >= 1e12) return sign + (a / 1e12).toLocaleString('ko-KR', { maximumFractionDigits: 1 }) + '조' + unit;
+                if (a >= 1e8) return sign + (a / 1e8).toLocaleString('ko-KR', { maximumFractionDigits: 1 }) + '억' + unit;
+                return sign + a.toLocaleString('ko-KR') + unit;
+            }
+            function period(p) { var m = /^(\d{4})-Q(\d)$/.exec(p || ''); return m ? m[1] + '년 ' + m[2] + '분기' : '최근 분기'; }
+            function fundamentals(box, d) {
+                var type = d[7], cur = d[8], per = d[9], oi = d[10], rev = d[11], ndq = d[12], ndy = d[13];
+                var wrap = el('div', 'sfg-fund');
+                wrap.appendChild(el('h4', null, '펀더멘털 점검'));
+                if (type === 'fund') {
+                    wrap.appendChild(el('p', 'sfg-fund-note', 'ETF는 하나의 기업이 아니라 영업이익·순현금이 없습니다. 담고 있는 기업들의 실적을 함께 보세요.'));
+                    return wrap;
+                }
+                var grid = el('div', 'sfg-fund-grid');
+                // 영업이익
+                var t1 = el('div', 'sfg-tile');
+                t1.appendChild(el('span', 'k', '영업이익 · ' + period(per)));
+                if (typeof oi === 'number') {
+                    var b1 = el('b', null, (oi < 0 ? '영업손실 ' : '') + money(Math.abs(oi) * (oi < 0 ? 1 : 1), cur));
+                    b1.style.color = oi >= 0 ? '#4ade80' : '#f87171';
+                    t1.appendChild(b1);
+                    if (typeof rev === 'number' && rev > 0) t1.appendChild(el('span', 's', '매출 ' + money(rev, cur) + ' · 영업이익률 ' + (oi / rev * 100).toFixed(1) + '%'));
+                } else t1.appendChild(el('b', null, '정보 없음'));
+                grid.appendChild(t1);
+                // 순현금 = 현금성 자산 − 총부채 (net_debt의 부호 반대)
+                var t2 = el('div', 'sfg-tile');
+                var nd = typeof ndq === 'number' ? ndq : ndy, isQ = typeof ndq === 'number';
+                t2.appendChild(el('span', 'k', (nd != null && nd > 0 ? '순부채' : '순현금') + ' · ' + (isQ ? period(per) + ' 말' : '직전 회계연도 말')));
+                if (typeof nd === 'number') {
+                    var b2 = el('b', null, money(Math.abs(nd), cur));
+                    b2.style.color = nd <= 0 ? '#4ade80' : '#f87171';
+                    t2.appendChild(b2);
+                    t2.appendChild(el('span', 's', nd <= 0 ? '현금이 빚보다 많음' : '빚이 현금보다 많음'));
+                } else t2.appendChild(el('b', null, '정보 없음'));
+                grid.appendChild(t2);
+                wrap.appendChild(grid);
+                var warn = (typeof oi === 'number' && oi < 0) || (typeof nd === 'number' && nd > 0);
+                wrap.appendChild(el('p', 'sfg-fund-note', warn
+                    ? '주의: 영업손실이거나 빚이 현금보다 많습니다. 공포 구간이라도 싸다고만 볼 수는 없습니다.'
+                    : '공포 구간에서는 이익을 내고 현금이 넉넉한지 함께 확인하세요. 출처: TradingView 재무 데이터'));
+                return wrap;
+            }
 
             function initSFG(box) {
                 var symbol = box.dataset.symbol, name = box.dataset.name || symbol.split(':')[1];
@@ -1162,6 +1217,7 @@
                     rate.style.color = lv[2];
                     svg.querySelector('.sfg-needle').style.transform = 'rotate(' + (-90 + score * 1.8) + 'deg)';
                     svg.setAttribute('aria-label', name + ' 공포·탐욕 지수 ' + score + '점, ' + lv[1]);
+                    box.insertBefore(fundamentals(box, d), det);
                 }).catch(function () {
                     rate.textContent = '지금은 값을 불러오지 못했습니다';
                     rate.style.color = '#94a3b8';
