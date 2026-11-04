@@ -1140,7 +1140,7 @@
                 wrap.appendChild(grid);
                 var warn = (typeof oi === 'number' && oi < 0) || (typeof nd === 'number' && nd > 0);
                 wrap.appendChild(el('p', 'sfg-fund-note', warn
-                    ? '주의: 영업손실이거나 빚이 현금보다 많습니다. 공포 구간이라도 싸다고만 볼 수는 없습니다.'
+                    ? '주의: 영업손실이거나 빚이 현금보다 많습니다. 공포 구간이라도 싸다고만 볼 수는 없습니다. (자동차·지주사처럼 금융 계열사가 있으면 그 빚이 함께 잡혀 크게 보일 수 있습니다.)'
                     : '공포 구간에서는 이익을 내고 현금이 넉넉한지 함께 확인하세요. 출처: TradingView 재무 데이터'));
                 return wrap;
             }
