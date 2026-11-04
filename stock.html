@@ -1106,6 +1106,11 @@
                 if (a >= 1e8) return sign + (a / 1e8).toLocaleString('ko-KR', { maximumFractionDigits: 1 }) + '억' + unit;
                 return sign + a.toLocaleString('ko-KR') + unit;
             }
+            function prevQ(p) {
+                var m = /^(\d{4})-Q(\d)$/.exec(p || ''); if (!m) return null;
+                var y = +m[1], q = +m[2] - 1; if (q < 1) { q = 4; y--; }
+                return y + '-Q' + q;
+            }
             function period(p) { var m = /^(\d{4})-Q(\d)$/.exec(p || ''); return m ? m[1] + '년 ' + m[2] + '분기' : '최근 분기'; }
             function fundamentals(box, d) {
                 var type = d[7], cur = d[8], per = d[9], oi = d[10], rev = d[11], ndq = d[12], ndy = d[13];
@@ -1137,11 +1142,43 @@
                     t2.appendChild(el('span', 's', nd <= 0 ? '현금이 빚보다 많음' : '빚이 현금보다 많음'));
                 } else t2.appendChild(el('b', null, '정보 없음'));
                 grid.appendChild(t2);
+                // FCF(잉여현금흐름) = 영업으로 번 현금 − 설비투자. 전 분기 대비 증감 포함
+                var t3 = el('div', 'sfg-tile');
+                var k3 = el('span', 'k', 'FCF(잉여현금흐름)');
+                var b3 = el('b', null, '불러오는 중…');
+                var s3 = el('span', 's', '');
+                t3.append(k3, b3, s3);
+                grid.appendChild(t3);
+                fetch('https://scanner.tradingview.com/symbol?symbol=' + encodeURIComponent(box.dataset.symbol) + '&fields=free_cash_flow_fq_h&no_404=true')
+                    .then(function (r) { return r.json(); })
+                    .then(function (j) {
+                        var h = (j && j.free_cash_flow_fq_h) || [];
+                        var per0 = per;
+                        // 맨 앞이 비어 있으면(아직 미공시) 한 분기 앞 값부터 사용
+                        if (h.length && (h[0] == null || h[0] >= 1e99)) { h = h.slice(1); per0 = prevQ(per); }
+                        var cur0 = h[0], prev0 = h[1];
+                        if (typeof cur0 !== 'number' || cur0 >= 1e99) throw new Error('no fcf');
+                        k3.textContent = 'FCF(잉여현금흐름) · ' + period(per0);
+                        b3.textContent = money(cur0, cur);
+                        b3.style.color = cur0 >= 0 ? '#4ade80' : '#f87171';
+                        if (typeof prev0 === 'number' && prev0 < 1e99) {
+                            var diff = cur0 - prev0;
+                            var arrow = diff > 0 ? '▲ ' : diff < 0 ? '▼ ' : '';
+                            var txt = '전 분기 대비 ' + arrow + money(Math.abs(diff), cur) + (diff > 0 ? ' 증가' : diff < 0 ? ' 감소' : ' 변화 없음');
+                            if (prev0 > 0 && cur0 > 0) txt += ' (' + (diff / prev0 * 100 > 0 ? '+' : '') + (diff / prev0 * 100).toFixed(1) + '%)';
+                            s3.textContent = txt + ' · 직전 ' + money(prev0, cur);
+                            s3.style.color = diff >= 0 ? '#86efac' : '#fca5a5';
+                        }
+                        if (cur0 < 0) note.textContent = '주의: FCF가 마이너스입니다(번 현금보다 투자·지출이 많음). 대규모 설비투자 때문인지 함께 확인하세요.' + (warn ? ' ' + note.textContent : '');
+                    })
+                    .catch(function () { b3.textContent = '정보 없음'; });
                 wrap.appendChild(grid);
                 var warn = (typeof oi === 'number' && oi < 0) || (typeof nd === 'number' && nd > 0);
-                wrap.appendChild(el('p', 'sfg-fund-note', warn
+                var note = el('p', 'sfg-fund-note', '');
+                wrap.appendChild(note);
+                note.textContent = (warn
                     ? '주의: 영업손실이거나 빚이 현금보다 많습니다. 공포 구간이라도 싸다고만 볼 수는 없습니다. (자동차·지주사처럼 금융 계열사가 있으면 그 빚이 함께 잡혀 크게 보일 수 있습니다.)'
-                    : '공포 구간에서는 이익을 내고 현금이 넉넉한지 함께 확인하세요. 출처: TradingView 재무 데이터'));
+                    : '공포 구간에서는 이익을 내고 현금이 넉넉한지 함께 확인하세요. 출처: TradingView 재무 데이터');
                 return wrap;
             }
 
