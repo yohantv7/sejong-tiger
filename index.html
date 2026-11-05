@@ -110,38 +110,6 @@
                 </div>
             </section>
         </div>
-
-        <!-- ③ 오늘 -->
-        <div class="m-row">
-            <section class="cell today">
-                <div class="today-top">
-                    <h3 id="date"></h3>
-                    <span id="weather"></span>
-                </div>
-                <h1 id="clock">00:00:00</h1>
-                <h2 id="greeting">안녕하세요!</h2>
-                <!-- 오늘의 활동 및 목표: 화면에서 숨김 (script.js가 이 요소들을 사용하므로 지우지 않음) -->
-                <div hidden>
-                <p class="eyebrow" style="margin-top:6px">오늘의 활동 및 목표</p>
-                <div class="input-group">
-                    <!-- Autofill Trap: Invisible inputs to trick browser -->
-                    <div style="width:0; height:0; overflow:hidden; position:absolute;">
-                        <input type="text" name="fake_username_trap" tabindex="-1" aria-hidden="true">
-                        <input type="password" name="fake_password_trap" tabindex="-1" aria-hidden="true">
-                    </div>
-                    <input type="text" id="daily-goal-input" placeholder="새로운 목표 추가" aria-label="할 일 입력"
-                        autocomplete="new-password" name="unique_goal_field_v1" readonly
-                        onfocus="this.removeAttribute('readonly');">
-                    <div class="time-selector-group">
-                        <select id="todo-hour" aria-label="시"></select> :
-                        <select id="todo-minute" aria-label="분"></select>
-                    </div>
-                    <button id="add-btn" type="button">추가</button>
-                </div>
-                <ul id="todo-list" class="todo-list"></ul>
-                </div>
-            </section>
-        </div>
     </div>
 
     <!-- Auth Modal -->
