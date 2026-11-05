@@ -49,12 +49,11 @@
 .top-bar .menu {
   flex: 1 1 520px; padding: 0;
   display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
-  gap: 8px clamp(16px, 3.4vw, 56px);
+  gap: 8px clamp(40px, 7vw, 120px);
 }
 .top-bar .menu-btn {
-  min-height: 44px; padding: 0 4px;
-  background: none; border: 0; border-radius: 0;
-  border-bottom: 2px solid transparent;
+  min-height: 44px; padding: 0 8px;
+  background: none; border: 2px solid transparent; border-radius: 2px;
   box-shadow: none;
   color: var(--top-text);
   font-size: 19px; font-weight: 700;
@@ -79,15 +78,67 @@
 .top-bar #auth-btn:focus-visible,
 .top-bar #signup-btn:focus-visible { outline: 2px solid #ffffff; outline-offset: 2px; }
 
-/* 메뉴를 누르면 펼쳐지는 하위 목록: 사진 위에 겹쳐서 표시 */
+/* ---------- 메뉴를 누르면: 상단바가 흰색으로 바뀌고, 각 메뉴 바로 아래에 연한 글씨로 하위 메뉴 표시 (finetnc 방식) ---------- */
+:root {
+  --sub-bg: #ffffff;
+  --sub-ink: #1c1f24;        /* 흰 바탕일 때 상단 메뉴 글자 */
+  --sub-soft: #8a8f96;       /* 하위 메뉴 글자 (엷은 밝기) */
+  --sub-hover: #1c1f24;      /* 하위 메뉴에 마우스를 올렸을 때 */
+}
 .top-head { position: relative; z-index: 4; }
+.top-head .top-bar { transition: background-color .2s ease; }
+
+/* 열렸을 때 상단바 */
+.top-head.is-open .top-bar { background: var(--sub-bg); -webkit-backdrop-filter: none; backdrop-filter: none; }
+.top-head.is-open .logo,
+.top-head.is-open .logo:hover,
+.top-head.is-open .menu-btn { color: var(--sub-ink); }
+.top-head.is-open .logo-mark { background: rgba(28, 31, 36, .35); }
+.top-head.is-open #user-info { color: var(--sub-soft); }
+.top-head.is-open .menu-btn:focus-visible { outline-color: var(--sub-ink); }
+/* 누른 메뉴는 테두리 상자로 표시 */
+.top-head.is-open .menu-btn[aria-expanded="true"] { border-color: var(--sub-ink); }
+.top-head.is-open .menu-btn:hover { border-bottom-color: var(--sub-ink); }
+.top-head .menu-btn::after { display: none !important; }   /* ▼ 표시 숨김 */
+
+/* 하위 메뉴 패널 */
 .top-head > .mega {
   position: absolute; z-index: 4;
   left: 0; right: 0; top: 100%;
-  color: var(--ink);
-  font-family: 'IBM Plex Sans KR', sans-serif;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, .25);
+  padding: 4px 0 36px;
+  background: var(--sub-bg);
+  color: var(--sub-soft);
+  font-family: 'Noto Sans KR', 'IBM Plex Sans KR', sans-serif;
+  box-shadow: 0 14px 24px rgba(0, 0, 0, .18);
 }
+.top-head .mega-grid { display: block; position: relative; }
+.top-head .mega-col,
+.top-head .mega-col.is-active {
+  position: absolute; top: 0;
+  padding: 0; border-radius: 0;
+  background: none; box-shadow: none;
+}
+.top-head .mega-col h2 { display: none; }      /* 제목 없이 목록만 */
+.top-head .mega .tree {
+  margin: 0; padding: 0; border: 0;
+  display: flex; flex-direction: column;
+}
+.top-head .mega .tree li { padding: 0; }
+.top-head .mega .tree li::before,
+.top-head .mega .tree li::after { display: none; }   /* 트리 선 없애기 */
+.top-head .mega .tree a,
+.top-head .mega-empty {
+  display: block; min-height: 0;
+  padding: 7px 0;
+  font-size: 17px; font-weight: 500; line-height: 1.4;
+  color: var(--sub-soft);
+  text-decoration: none; white-space: normal; word-break: keep-all; overflow-wrap: break-word;
+}
+.top-head .mega-empty { margin: 0; }
+.top-head .mega .tree a svg { display: none; }
+.top-head .mega .tree a:hover,
+.top-head .mega .tree a:focus-visible { color: var(--sub-hover); outline: none; }
+.top-head .mega-col.is-active .tree a { color: #5f646b; }   /* 누른 메뉴의 하위 목록은 조금 더 진하게 */
 
 /* ---------- 가운데 문구 ---------- */
 .top-hero {
@@ -138,4 +189,10 @@
   .top-bar .menu .auth-cell { margin-left: 0; width: 100%; justify-content: flex-start; }
   .top-bar #auth-btn, .top-bar #signup-btn { min-height: 38px; padding: 0 18px; font-size: 14px; }
   .top-hero { padding-block: 72px 96px; }
+  /* 휴대폰: 메뉴가 여러 줄이라 아래에 칸으로 나열하고 제목을 다시 보여줌 */
+  .top-head > .mega { padding: 8px 20px 24px; }
+  .top-head .mega-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 18px 20px; min-height: 0 !important; }
+  .top-head .mega-col, .top-head .mega-col.is-active { position: static; }
+  .top-head .mega-col h2 { display: block; font-size: 15px; color: var(--sub-ink); margin: 0 0 4px; padding: 0; border: 0; }
+  .top-head .mega .tree a, .top-head .mega-empty { font-size: 16px; padding: 5px 0; }
 }

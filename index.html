@@ -65,7 +65,7 @@
                 </section>
                 <section class="mega-col" data-col="shop">
                     <h2>쇼핑몰</h2>
-                    <ul class="tree"><li><a href="https://hpmaker.co.kr/shop" target="_blank" rel="noopener noreferrer">hpmaker.co.kr/shop<svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 17L17 7M9 7h8v8"/></svg></a></li></ul>
+                    <ul class="tree"><li><a href="https://hpmaker.co.kr/shop" target="_blank" rel="noopener noreferrer">hpmaker.co.kr<wbr>/shop<svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 17L17 7M9 7h8v8"/></svg></a></li></ul>
                 </section>
                 <section class="mega-col" data-col="platform">
                     <h2>플랫폼</h2>
@@ -338,15 +338,41 @@
             const btns = document.querySelectorAll('.menu-btn[data-menu]');
             if (!panel) return;
             let current = null;
+            const head = panel.closest('.top-head');
+            const grid = panel.querySelector('.mega-grid');
+            // 각 하위 목록을 해당 상단 메뉴 바로 아래에 맞춰 배치 (finetnc 방식)
+            function layout() {
+                if (panel.hidden || !grid) return;
+                const narrow = window.matchMedia('(max-width: 720px)').matches;
+                const base = grid.getBoundingClientRect().left;
+                let tallest = 0;
+                const btnList = Array.prototype.slice.call(btns);
+                panel.querySelectorAll('.mega-col').forEach(function (col) {
+                    const i = btnList.findIndex(function (x) { return x.dataset.menu === col.dataset.col; });
+                    const b = btnList[i], next = btnList[i + 1];
+                    if (narrow || !b) { col.style.left = ''; col.style.maxWidth = ''; return; }
+                    const r = b.getBoundingClientRect();
+                    col.style.left = (r.left - base) + 'px';
+                    // 다음 메뉴와 같은 줄이면 그 앞에서 줄바꿈
+                    const nr = next && next.getBoundingClientRect();
+                    col.style.maxWidth = (nr && Math.abs(nr.top - r.top) < 4) ? (nr.left - r.left - 16) + 'px' : '220px';
+                    tallest = Math.max(tallest, col.offsetHeight);
+                });
+                grid.style.minHeight = narrow ? '' : tallest + 'px';
+            }
+            window.addEventListener('resize', layout);
             function close() {
+                if (head) head.classList.remove('is-open');
                 panel.hidden = true; current = null;
                 btns.forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
                 panel.querySelectorAll('.mega-col').forEach(function (c) { c.classList.remove('is-active'); });
             }
             function open(key) {
                 panel.hidden = false; current = key;
+                if (head) head.classList.add('is-open');
                 btns.forEach(function (b) { b.setAttribute('aria-expanded', b.dataset.menu === key ? 'true' : 'false'); });
                 panel.querySelectorAll('.mega-col').forEach(function (c) { c.classList.toggle('is-active', c.dataset.col === key); });
+                layout();
                 const col = panel.querySelector('.mega-col[data-col="' + key + '"]');
                 const first = col && col.querySelector('a');
                 if (window.matchMedia('(max-width: 720px)').matches && col) col.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
