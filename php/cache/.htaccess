@@ -1,0 +1,8 @@
+# 저장된 공시 데이터는 웹에서 직접 열 수 없게 막기
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>

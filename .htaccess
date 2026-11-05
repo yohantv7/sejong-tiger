@@ -1,0 +1,13 @@
+# 가비아 웹호스팅(Apache) 설정 — Vercel 에서는 이 파일을 쓰지 않습니다.
+DirectoryIndex index.html
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # SSL(https) 인증서를 연결한 뒤 아래 두 줄의 # 을 지우면 http 접속을 https 로 바꿉니다.
+    # RewriteCond %{HTTPS} !=on
+    # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # 주식정보 페이지의 공시 데이터: /api/fundamentals → php/fundamentals.php
+    RewriteRule ^api/fundamentals/?$ php/fundamentals.php [L,QSA]
+</IfModule>
