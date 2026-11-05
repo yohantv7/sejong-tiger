@@ -77,7 +77,7 @@
                         <li><a href="stock.html">주식정보</a></li>
                         <li><a href="senior.html">시니어생활</a></li>
                         <li><a href="marketing.html">마케팅</a></li>
-                        <li><a href="#partners">PARTNERS</a></li>
+                        <li><a href="partners.html">PARTNERS</a></li>
                     </ul>
                 </section>
             </div>
@@ -176,22 +176,6 @@
             </section>
 
         </div>
-
-        <!-- ⑤ 제휴 + 푸터 -->
-        <footer class="m-row">
-            <div class="cell partners" id="partners">
-                <span class="eyebrow">Partners</span>
-                <a class="chip" href="https://lpweb.kr/click.php?m=kbbook&a=A100701605&l=0000" target="_blank" rel="noopener sponsored">교보문고</a>
-                <a class="chip" href="https://linkmoa.kr/click.php?m=yes24&a=A100701605&l=0000" target="_blank" rel="noopener sponsored">YES24</a>
-                <a class="chip" href="https://linkmoa.kr/click.php?m=usimsa&a=A100701605&l=0000" target="_blank" rel="noopener sponsored">USIMSA</a>
-                <a class="chip" href="https://lase.kr/click.php?m=yanolja&a=A100701605&l=0000" target="_blank" rel="noopener sponsored">야놀자</a>
-                <a class="chip" href="https://link.coupang.com/a/bXSj4l" target="_blank" rel="noopener sponsored">쿠팡</a>
-            </div>
-            <div class="cell blue spacer" aria-hidden="true"></div>
-            <div class="cell disclosure partners-footer">
-                이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
-            </div>
-        </footer>
     </div>
 
     <!-- Auth Modal -->
@@ -409,7 +393,7 @@
             document.addEventListener('click', function (e) {
                 if (!panel.hidden && !(head && head.contains(e.target))) close();
             });
-            // 같은 페이지 안으로 이동하는 하위 메뉴(예: PARTNERS)는 누르면 메뉴를 닫고 부드럽게 이동
+            // 같은 페이지 안으로 이동하는 하위 메뉴(# 링크)는 누르면 메뉴를 닫고 부드럽게 이동
             panel.querySelectorAll('a[href^="#"]').forEach(function (a) {
                 a.addEventListener('click', function (e) {
                     const target = document.querySelector(a.getAttribute('href'));

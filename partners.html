@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>PARTNERS - 세종호랑이</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* 메인 첫 화면(top.css)과 같은 색·글꼴: 어두운 상단바 + 사진 띠 + 밝은 카드 목록 */
+        :root {
+            --bar: #0e141c;
+            --ink: #1c1f24;
+            --soft: #6b717a;
+            --line: #e4e7ec;
+            --paper: #f5f6f8;
+            --card: #ffffff;
+            --amber: #f2a541;
+            --navy: #1f3f9a;
+            --font: 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            --latin: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            background: var(--paper);
+            color: var(--ink);
+            font-family: var(--font);
+            word-break: keep-all;
+        }
+        a { color: inherit; }
+        .wrap {
+            max-width: 1180px; margin: 0 auto;
+            padding-left: max(20px, env(safe-area-inset-left, 0px));
+            padding-right: max(20px, env(safe-area-inset-right, 0px));
+        }
+
+        /* 상단바 */
+        .bar { background: var(--bar); color: #fff; }
+        .bar .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 76px; }
+        .logo { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; font-weight: 900; font-size: 22px; }
+        .logo-mark { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; width: 30px; height: 30px; padding: 2px; background: rgba(255,255,255,.55); }
+        .logo-mark span:nth-child(1) { background: #f7c9c4; }
+        .logo-mark span:nth-child(2) { background: #fff; }
+        .logo-mark span:nth-child(3) { background: #fff; }
+        .logo-mark span:nth-child(4) { background: #c9d6f2; }
+        .home {
+            display: inline-flex; align-items: center; gap: 8px;
+            min-height: 42px; padding: 0 20px; border-radius: 999px;
+            background: var(--amber); color: #1d1406;
+            font-weight: 700; font-size: 15px; text-decoration: none;
+        }
+        .home:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,0,0,.3); }
+        .home:focus-visible, .card:focus-visible { outline: 3px solid var(--navy); outline-offset: 3px; }
+
+        /* 사진 띠 */
+        .band {
+            position: relative;
+            background: #0b1118 url("hero-dev.jpg") center 40% / cover no-repeat;
+            color: #fff; text-align: center;
+        }
+        .band::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8,12,18,.55), rgba(8,12,18,.78)); }
+        .band .wrap { position: relative; z-index: 1; padding-block: 72px 80px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+        .band h1 {
+            margin: 0;
+            font-family: var(--latin); font-weight: 800;
+            font-size: clamp(40px, 6vw, 72px); letter-spacing: .14em;
+            padding-left: .14em;
+        }
+        .band h1 span { color: var(--amber); }
+        .band p { margin: 0; font-size: clamp(16px, 1.8vw, 21px); color: rgba(255,255,255,.88); }
+
+        /* 카드 목록 */
+        .list { padding-block: 56px 40px; }
+        .grid {
+            list-style: none; margin: 0; padding: 0;
+            display: grid; gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr));
+        }
+        .card {
+            height: 100%;
+            display: flex; flex-direction: column;
+            background: var(--card);
+            border: 1px solid var(--line); border-radius: 14px;
+            text-decoration: none;
+            overflow: hidden;
+            transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+        }
+        .card:hover { transform: translateY(-4px); box-shadow: 0 14px 28px rgba(14,20,28,.12); border-color: transparent; }
+        .logo-box {
+            height: 128px;
+            display: flex; align-items: center; justify-content: center;
+            padding: 24px; border-bottom: 1px solid var(--line);
+        }
+        .logo-box img { max-height: 64px; width: auto; }
+        .info { flex: 1; display: flex; flex-direction: column; gap: 6px; padding: 18px 20px 20px; }
+        .name { margin: 0; font-size: 19px; font-weight: 700; }
+        .desc { margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--soft); }
+        .go {
+            margin-top: auto; padding-top: 12px;
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 14px; font-weight: 700; color: var(--navy);
+        }
+        .card:hover .go { text-decoration: underline; text-underline-offset: 3px; }
+
+        .note {
+            margin: 0;
+            padding-block: 24px 48px;
+            font-size: 13px; line-height: 1.7; color: var(--soft);
+            border-top: 1px solid var(--line);
+        }
+
+        @media (prefers-reduced-motion: reduce) { .card, .home { transition: none; } .card:hover, .home:hover { transform: none; } }
+        @media (max-width: 560px) {
+            .bar .wrap { min-height: 64px; }
+            .logo { font-size: 19px; }
+            .home { min-height: 38px; padding: 0 16px; font-size: 14px; }
+            .band .wrap { padding-block: 52px 56px; }
+            .list { padding-block: 32px 24px; }
+            .grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+            .logo-box { height: 96px; padding: 16px; }
+            .logo-box img { max-height: 48px; }
+            .info { padding: 14px; }
+            .name { font-size: 17px; }
+            .desc { font-size: 13px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="bar">
+        <div class="wrap">
+            <a class="logo" href="index.html" aria-label="세종호랑이 메인으로">
+                <span class="logo-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+                세종호랑이
+            </a>
+            <a class="home" href="index.html">← 메인으로</a>
+        </div>
+    </header>
+
+    <section class="band">
+        <div class="wrap">
+            <h1>PARTNERS<span>.</span></h1>
+            <p>책, 여행, 쇼핑까지 자주 쓰는 서비스를 한곳에 모았습니다.</p>
+        </div>
+    </section>
+
+    <main class="list">
+        <div class="wrap">
+            <ul class="grid">
+                <li>
+                    <a class="card" href="https://lpweb.kr/click.php?m=kbbook&a=A100701605&l=0000" target="_blank" rel="noopener sponsored">
+                        <div class="logo-box"><img src="kyobo.png" alt="교보문고 로고"></div>
+                        <div class="info">
+                            <p class="name">교보문고</p>
+                            <p class="desc">국내외 도서, 전자책, 문구·음반</p>
+                            <span class="go">바로가기 ↗</span>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a class="card" href="https://linkmoa.kr/click.php?m=yes24&a=A100701605&l=0000" target="_blank" rel="noopener sponsored">
+                        <div class="logo-box"><img src="yes24.png" alt="YES24 로고"></div>
+                        <div class="info">
+                            <p class="name">YES24</p>
+                            <p class="desc">도서 쇼핑과 공연·전시 예매</p>
+                            <span class="go">바로가기 ↗</span>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a class="card" href="https://linkmoa.kr/click.php?m=usimsa&a=A100701605&l=0000" target="_blank" rel="noopener sponsored">
+                        <div class="logo-box"><img src="usimsa.png" alt="USIMSA 로고"></div>
+                        <div class="info">
+                            <p class="name">USIMSA</p>
+                            <p class="desc">해외여행용 eSIM·유심</p>
+                            <span class="go">바로가기 ↗</span>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a class="card" href="https://lase.kr/click.php?m=yanolja&a=A100701605&l=0000" target="_blank" rel="noopener sponsored">
+                        <div class="logo-box"><img src="yanolja.png" alt="야놀자 로고"></div>
+                        <div class="info">
+                            <p class="name">야놀자</p>
+                            <p class="desc">숙소, 레저, 교통 예약</p>
+                            <span class="go">바로가기 ↗</span>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a class="card" href="https://link.coupang.com/a/bXSj4l" target="_blank" rel="noopener sponsored">
+                        <div class="logo-box"><img src="coupang_logo.png" alt="쿠팡 로고"></div>
+                        <div class="info">
+                            <p class="name">쿠팡</p>
+                            <p class="desc">생활용품부터 가전까지 빠른 배송</p>
+                            <span class="go">바로가기 ↗</span>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </main>
+
+    <footer class="wrap">
+        <p class="note">
+            이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.<br>
+            위 링크는 제휴 링크로, 링크를 통해 구매하면 세종호랑이에 일정 수수료가 지급될 수 있습니다.
+        </p>
+    </footer>
+</body>
+</html>
