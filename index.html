@@ -7,9 +7,11 @@
     <title>세종호랑이</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Sans+KR:wght@400;500;700&family=Noto+Sans+KR:wght@500;700;900&display=swap" rel="stylesheet">
     <!-- 메인 페이지 전용 몬드리안 테마 (다른 페이지는 계속 index.css 사용) -->
     <link rel="stylesheet" href="mondrian.css">
+    <!-- 상단바 + 첫 화면 사진 (top.css) -->
+    <link rel="stylesheet" href="top.css">
 
     <!-- Open Graph for KakaoTalk & Link Preview -->
     <meta property="og:type" content="website">
@@ -24,15 +26,15 @@
 </head>
 
 <body>
-    <div class="m-grid">
-
-        <!-- ① 로고 + 메뉴 -->
-        <header class="m-row">
-            <a class="cell logo" href="index.html" aria-label="세종호랑이 홈">
+    <!-- ① 상단바 + 첫 화면 사진 (finetnc.co.kr 구성 참고) -->
+    <div class="top">
+        <div class="top-head">
+        <header class="top-bar">
+            <a class="logo" href="index.html" aria-label="세종호랑이 홈">
                 <span class="logo-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
                 <span class="logo-text">세종호랑이</span>
             </a>
-            <nav class="cell menu" aria-label="주 메뉴">
+            <nav class="menu" aria-label="주 메뉴">
                 <button type="button" class="menu-btn" data-menu="saas" aria-expanded="false" aria-controls="mega">SAAS</button>
                 <button type="button" class="menu-btn" data-menu="home" aria-expanded="false" aria-controls="mega">홈페이지</button>
                 <button type="button" class="menu-btn" data-menu="shop" aria-expanded="false" aria-controls="mega">쇼핑몰</button>
@@ -80,12 +82,20 @@
                 </section>
             </div>
         </div>
+        </div>
 
-        <!-- ② 메인(빨강) -->
+        <section class="top-hero">
+            <p class="top-eyebrow">BUILD <span>&amp;</span> LAUNCH</p>
+            <h1>SAAS, 홈페이지, 쇼핑몰, 플랫폼 제작</h1>
+            <p class="top-sub">아이디어를 실제로 동작하는 서비스로 만들어 드립니다.</p>
+        </section>
+    </div>
+
+    <div class="m-grid">
+
+        <!-- ② 클래식 음악(빨강) -->
         <div class="m-row">
             <section class="cell red hero">
-                <p class="eyebrow">Web/App Daily Life</p>
-                <h1>SAAS, 홈페이지, 쇼핑몰, 플랫폼 제작을<br>취미로 만듭니다</h1>
                 <div id="lecture-panel" class="inner-grid lecture">
                     <a class="video" href="https://www.youtube.com/watch?v=24KcTbHJXlM" target="_blank" rel="noopener noreferrer" aria-label="클래식 음악 YouTube에서 보기 (새 탭)">
                         <img src="https://i.ytimg.com/vi/24KcTbHJXlM/hqdefault.jpg" alt="클래식 음악 영상 썸네일">
