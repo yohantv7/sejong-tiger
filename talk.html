@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>소통의 창 - 세종호랑이</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <!-- 글 목록·로그인은 메인과 같은 Firebase / script.js 를 그대로 사용 -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <style>
+        /* PARTNERS 페이지와 같은 틀: 어두운 상단바 + 사진 띠 + 밝은 본문. 소통의 창은 말풍선 카드로 */
+        :root {
+            --bar: #0e141c;
+            --ink: #1c1f24;
+            --soft: #6b717a;
+            --line: #e4e7ec;
+            --paper: #f5f6f8;
+            --card: #ffffff;
+            --amber: #f2a541;
+            --amber-soft: #fdf1df;
+            --cyan: #19b8e6;
+            --navy: #1f3f9a;
+            --font: 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            --latin: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font); word-break: keep-all; }
+        button, input, textarea { font: inherit; color: inherit; }
+        button { cursor: pointer; }
+        .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+        .wrap {
+            max-width: 860px; margin: 0 auto;
+            padding-left: max(20px, env(safe-area-inset-left, 0px));
+            padding-right: max(20px, env(safe-area-inset-right, 0px));
+        }
+
+        /* 상단바 */
+        .bar { background: var(--bar); color: #fff; }
+        .bar .wrap { max-width: 1180px; display: flex; align-items: center; gap: 14px; min-height: 76px; }
+        .logo { display: inline-flex; align-items: center; gap: 12px; color: #fff; text-decoration: none; font-weight: 900; font-size: 22px; margin-right: auto; }
+        .logo-mark { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; width: 30px; height: 30px; padding: 2px; background: rgba(255,255,255,.55); }
+        .logo-mark span:nth-child(1) { background: #f7c9c4; }
+        .logo-mark span:nth-child(2), .logo-mark span:nth-child(3) { background: #fff; }
+        .logo-mark span:nth-child(4) { background: #c9d6f2; }
+        #user-info { font-size: 14px; color: rgba(255,255,255,.82); }
+        .pill {
+            display: inline-flex; align-items: center; justify-content: center;
+            min-height: 42px; padding: 0 20px; border-radius: 999px; border: 0;
+            font-weight: 700; font-size: 15px; text-decoration: none; white-space: nowrap;
+        }
+        #auth-btn { background: var(--amber); color: #1d1406; }
+        .home { background: rgba(255,255,255,.12); color: #fff; }
+        .pill:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,0,0,.3); }
+        .pill:focus-visible, button:focus-visible, a:focus-visible, textarea:focus-visible { outline: 3px solid var(--navy); outline-offset: 3px; }
+        .bar .pill:focus-visible { outline-color: #fff; }
+
+        /* 사진 띠 */
+        .band { position: relative; background: #0b1118 url("hero-dev.jpg") center 40% / cover no-repeat; color: #fff; text-align: center; }
+        .band::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8,12,18,.55), rgba(8,12,18,.8)); }
+        .band .wrap { position: relative; z-index: 1; padding-block: 64px 72px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+        .band .eyebrow { margin: 0; font-family: var(--latin); font-weight: 800; font-size: 15px; letter-spacing: .32em; color: var(--amber); padding-left: .32em; }
+        .band h1 { margin: 0; font-weight: 900; font-size: clamp(36px, 5vw, 56px); letter-spacing: -.02em; }
+        .band p.lead { margin: 0; font-size: clamp(15px, 1.7vw, 19px); color: rgba(255,255,255,.88); }
+
+        /* 본문 */
+        main { padding-block: 0 56px; }
+        .board {
+            position: relative; margin-top: -36px;
+            background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+            box-shadow: 0 18px 40px rgba(14,20,28,.08);
+            padding: 28px clamp(18px, 4vw, 36px) 24px;
+        }
+        .board-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+        .board-head .hint { margin: 0; font-size: 15px; color: var(--soft); }
+        #login-cta { background: var(--ink); color: #fff; min-height: 40px; font-size: 14px; }
+
+        /* 글쓰기 */
+        .request-input-group { display: none; flex-direction: column; gap: 10px; padding-top: 18px; }
+        #request-input {
+            width: 100%; min-height: 110px; resize: vertical;
+            padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper);
+            font-size: 15px; line-height: 1.6;
+        }
+        #request-input:focus { background: #fff; border-color: var(--navy); outline: none; box-shadow: 0 0 0 3px rgba(31,63,154,.15); }
+        .compose-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .compose-foot small { color: var(--soft); font-size: 13px; }
+        #send-request-btn { background: var(--navy); color: #fff; min-height: 44px; padding: 0 26px; border-radius: 999px; border: 0; font-weight: 700; }
+        #send-request-btn:hover { box-shadow: 0 6px 16px rgba(31,63,154,.3); }
+
+        /* 글 목록 */
+        .list-title { display: flex; align-items: baseline; justify-content: space-between; margin: 26px 0 6px; }
+        .list-title h2 { margin: 0; font-size: 17px; }
+        #visitor-count-display { font-size: 13px; color: var(--soft); font-variant-numeric: tabular-nums; }
+        #request-list, #deposit-list, #user-list { list-style: none; margin: 0; padding: 0; }
+        #request-list:empty::before {
+            content: "아직 남겨진 글이 없습니다. 첫 글을 남겨 주세요.";
+            display: block; padding: 28px 0; text-align: center; color: var(--soft); font-size: 14px;
+        }
+        .request-item {
+            padding: 16px 0; border-bottom: 1px solid var(--line);
+            font-size: 15px; line-height: 1.65;
+        }
+        .request-item:last-child { border-bottom: 0; }
+        .request-item small {
+            display: inline-flex !important; align-items: center;
+            padding: 2px 10px; border-radius: 999px;
+            background: var(--amber-soft); color: #7a4a06; opacity: 1 !important;
+            font-size: 12.5px;
+        }
+        .request-item span { color: var(--soft) !important; }
+        .request-item > div > div > div { margin-top: 4px; }
+        .delete-req-btn { padding: 4px; }
+
+        #deposit-list-container .request-item { background: var(--paper); border-radius: 10px; margin-top: 8px; border: 0; }
+        #user-management-section h3 { font-size: 17px; margin: 20px 0 8px; }
+        .divider { border: 0; border-top: 1px solid var(--line); margin: 20px 0 0; }
+        #admin-link-container { margin-top: 16px; font-size: 14px; }
+        #admin-link-container a { color: var(--navy); font-weight: 700; }
+
+        /* 로그인 팝업 (메인과 같은 id 사용) */
+        .modal-overlay { position: fixed; inset: 0; z-index: 1000; display: none; align-items: center; justify-content: center; padding: 16px; background: rgba(14,20,28,.55); }
+        .modal-overlay.active { display: flex; }
+        .modal-content { width: 100%; max-width: 420px; background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,.3); }
+        .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; background: var(--bar); color: #fff; }
+        .modal-header h3 { margin: 0; font-size: 19px; }
+        .close-btn { background: none; border: 0; color: #fff; font-size: 26px; line-height: 1; padding: 4px 8px; }
+        .modal-tabs { display: flex; border-bottom: 1px solid var(--line); }
+        .tab-btn { flex: 1; min-height: 48px; background: #fff; border: 0; color: var(--soft); font-weight: 500; }
+        .tab-btn.active { color: var(--ink); font-weight: 700; box-shadow: inset 0 -3px 0 var(--amber); }
+        .auth-form { display: flex; flex-direction: column; gap: 10px; padding: 22px; }
+        .auth-form input { width: 100%; min-height: 46px; padding: 0 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); }
+        .auth-form input:focus { outline: none; border-color: var(--navy); background: #fff; }
+        #auth-submit-btn { min-height: 48px; margin-top: 4px; border: 0; border-radius: 10px; background: var(--amber); color: #1d1406; font-weight: 700; }
+
+        @media (prefers-reduced-motion: reduce) { .pill:hover { transform: none; } }
+        @media (max-width: 560px) {
+            .bar .wrap { min-height: 64px; flex-wrap: wrap; padding-block: 10px; }
+            .logo { font-size: 19px; }
+            #user-info { order: 3; width: 100%; }
+            .pill { min-height: 38px; padding: 0 14px; font-size: 14px; }
+            .band .wrap { padding-block: 48px 60px; }
+            .compose-foot small { display: none; }
+            #send-request-btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <header class="bar">
+        <div class="wrap">
+            <a class="logo" href="index.html" aria-label="세종호랑이 메인으로">
+                <span class="logo-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+                세종호랑이
+            </a>
+            <span id="user-info"></span>
+            <button id="auth-btn" class="pill" type="button">로그인</button>
+            <a class="pill home" href="index.html">메인으로</a>
+        </div>
+    </header>
+
+    <section class="band">
+        <div class="wrap">
+            <p class="eyebrow">TALK</p>
+            <h1>소통의 창</h1>
+            <p class="lead">궁금한 점이나 요청하고 싶은 것을 편하게 남겨 주세요.</p>
+        </div>
+    </section>
+
+    <main>
+        <div class="wrap">
+            <section class="board request-section" aria-labelledby="board-title">
+                <h2 id="board-title" class="sr-only">소통의 창</h2>
+                <div class="board-head">
+                    <p class="hint">로그인 후 요청사항 작성이 가능합니다.</p>
+                    <button id="login-cta" class="pill" type="button">로그인하고 글쓰기</button>
+                </div>
+
+                <div class="request-input-group">
+                    <label for="request-input" class="sr-only">메시지</label>
+                    <textarea id="request-input" placeholder="메시지를 입력하세요"></textarea>
+                    <div class="compose-foot">
+                        <small>Enter로 등록, Shift + Enter로 줄바꿈</small>
+                        <button id="send-request-btn" type="button">등록하기</button>
+                    </div>
+                </div>
+
+                <div class="list-title">
+                    <h2>남겨진 글</h2>
+                    <div id="visitor-count-display">방문자 : -명</div>
+                </div>
+                <div class="request-list-container">
+                    <ul id="request-list"></ul>
+                </div>
+
+                <div id="deposit-list-container" style="display:none;">
+                    <ul id="deposit-list"></ul>
+                </div>
+
+                <div id="user-management-section" style="display:none;">
+                    <hr class="divider">
+                    <h3>회원 관리</h3>
+                    <div class="user-list-container">
+                        <ul id="user-list"></ul>
+                    </div>
+                </div>
+
+                <div id="admin-link-container" style="display:none;">
+                    <a href="admin_users.html">회원 관리 시스템 (전체화면)</a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- 로그인 팝업 -->
+    <div id="auth-modal" class="modal-overlay">
+        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            <div class="modal-header">
+                <h3 id="modal-title">로그인</h3>
+                <button id="close-modal" type="button" class="close-btn" aria-label="닫기">&times;</button>
+            </div>
+            <div class="modal-tabs">
+                <button id="tab-login" type="button" class="tab-btn active">로그인</button>
+                <button id="tab-register" type="button" class="tab-btn">회원가입</button>
+            </div>
+            <div class="auth-form">
+                <input type="email" id="auth-email" placeholder="이메일" aria-label="이메일">
+                <input type="text" id="auth-username" placeholder="이름 (닉네임)" aria-label="이름 (닉네임)">
+                <div class="password-input-wrapper" style="position: relative;">
+                    <input type="password" id="auth-password" placeholder="비밀번호 (6자 이상)" aria-label="비밀번호"
+                        style="width: 100%; padding-right: 48px;">
+                    <button id="toggle-password" type="button" aria-label="비밀번호 보기"
+                        style="position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 1.1rem;">
+                        👁️
+                    </button>
+                </div>
+                <button id="auth-submit-btn" type="button">로그인</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // 로그인 전에는 '로그인하고 글쓰기' 버튼을, 로그인 후에는 숨김
+        (function () {
+            const cta = document.getElementById('login-cta');
+            const authBtn = document.getElementById('auth-btn');
+            if (!cta || !authBtn) return;
+            cta.addEventListener('click', function () { authBtn.click(); });
+            function sync() { cta.style.display = authBtn.textContent.trim() === '로그아웃' ? 'none' : ''; }
+            new MutationObserver(sync).observe(authBtn, { childList: true, characterData: true, subtree: true });
+            sync();
+        })();
+    </script>
+</body>
+</html>
