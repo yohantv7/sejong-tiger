@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>음악감상 - 세종호랑이</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Serif+KR:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        /* 어두운 공연장 분위기: 상단바와 같은 남색 바탕 위에 영상이 무대처럼 빛나도록 */
+        :root {
+            --stage: #0b1017;
+            --stage-2: #121a24;
+            --line: rgba(255, 255, 255, .12);
+            --text: #ffffff;
+            --dim: rgba(255, 255, 255, .72);
+            --amber: #f2a541;
+            --gold: #f6d77a;
+            --font: 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            --serif: 'Noto Serif KR', 'Batang', serif;
+            --latin: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+            color-scheme: dark;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; min-height: 100vh;
+            background:
+                radial-gradient(ellipse 70% 50% at 50% 0%, rgba(242, 165, 65, .14), transparent 70%),
+                var(--stage);
+            color: var(--text);
+            font-family: var(--font);
+            word-break: keep-all;
+        }
+        a { color: inherit; }
+        .wrap {
+            max-width: 1100px; margin: 0 auto;
+            padding-left: max(20px, env(safe-area-inset-left, 0px));
+            padding-right: max(20px, env(safe-area-inset-right, 0px));
+        }
+
+        /* 상단바 */
+        .bar { border-bottom: 1px solid var(--line); background: rgba(11, 16, 23, .85); }
+        .bar .wrap { max-width: 1180px; display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 76px; }
+        .logo { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; font-weight: 900; font-size: 22px; }
+        .logo-mark { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; width: 30px; height: 30px; padding: 2px; background: rgba(255,255,255,.55); }
+        .logo-mark span:nth-child(1) { background: #f7c9c4; }
+        .logo-mark span:nth-child(2), .logo-mark span:nth-child(3) { background: #fff; }
+        .logo-mark span:nth-child(4) { background: #c9d6f2; }
+        .pill {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            min-height: 42px; padding: 0 20px; border-radius: 999px; border: 0;
+            font: inherit; font-weight: 700; font-size: 15px; text-decoration: none; white-space: nowrap; cursor: pointer;
+        }
+        .home { background: var(--amber); color: #1d1406; }
+        .pill:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,0,0,.35); }
+        a:focus-visible, button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+
+        /* 제목 */
+        .intro { text-align: center; padding-block: 56px 36px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+        .eyebrow { margin: 0; font-family: var(--latin); font-weight: 800; font-size: 14px; letter-spacing: .34em; padding-left: .34em; color: var(--amber); }
+        .intro h1 { margin: 0; font-family: var(--serif); font-weight: 700; font-size: clamp(36px, 5vw, 58px); letter-spacing: -.01em; }
+        .intro p { margin: 0; color: var(--dim); font-size: clamp(15px, 1.7vw, 18px); }
+        .staff { width: min(320px, 70%); height: 22px; margin-top: 6px; opacity: .55; }
+
+        /* 영상 */
+        .player {
+            position: relative; aspect-ratio: 16 / 9; max-width: 100%;
+            border-radius: 18px; overflow: hidden;
+            background: #000;
+            box-shadow: 0 0 0 1px var(--line), 0 30px 80px rgba(0, 0, 0, .6), 0 0 120px rgba(242, 165, 65, .12);
+        }
+        .player img, .player iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; object-fit: cover; }
+        .play-btn {
+            position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,.45));
+            border: 0; padding: 0; cursor: pointer; color: #1d1406;
+        }
+        .play-btn .circle {
+            width: 92px; height: 92px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--gold);
+            box-shadow: 0 0 0 10px rgba(246, 215, 122, .25), 0 12px 30px rgba(0,0,0,.45);
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+        .play-btn:hover .circle { transform: scale(1.06); box-shadow: 0 0 0 16px rgba(246, 215, 122, .2), 0 12px 30px rgba(0,0,0,.45); }
+        .play-btn .label {
+            position: absolute; left: 24px; bottom: 20px;
+            font-size: 14px; font-weight: 700; color: #fff; text-shadow: 0 1px 8px rgba(0,0,0,.6);
+        }
+
+        /* 영상 정보 */
+        .about {
+            margin-top: 28px;
+            display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px 24px;
+            padding: 22px 26px; border: 1px solid var(--line); border-radius: 16px; background: var(--stage-2);
+        }
+        .about-text { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+        .about-text .kicker { font-size: 13px; color: var(--amber); font-weight: 700; }
+        .about-text h2 { margin: 0; font-family: var(--serif); font-size: 24px; }
+        .about-text p { margin: 2px 0 0; color: var(--dim); font-size: 14.5px; }
+        .yt { background: #fff; color: #111; }
+        .yt svg { flex: none; }
+
+        footer { padding-block: 48px; text-align: center; color: rgba(255,255,255,.4); font-size: 13px; }
+
+        @media (prefers-reduced-motion: reduce) { .pill:hover, .play-btn:hover .circle { transform: none; } }
+        @media (max-width: 560px) {
+            .bar .wrap { min-height: 64px; }
+            .logo { font-size: 19px; }
+            .pill { min-height: 38px; padding: 0 16px; font-size: 14px; }
+            .intro { padding-block: 40px 26px; }
+            .player { border-radius: 12px; }
+            .play-btn .circle { width: 68px; height: 68px; }
+            .play-btn .label { display: none; }
+            .about { padding: 18px; }
+            .yt { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <header class="bar">
+        <div class="wrap">
+            <a class="logo" href="index.html" aria-label="세종호랑이 메인으로">
+                <span class="logo-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+                세종호랑이
+            </a>
+            <a class="pill home" href="index.html">← 메인으로</a>
+        </div>
+    </header>
+
+    <main class="wrap">
+        <section class="intro">
+            <p class="eyebrow">CLASSICAL MUSIC</p>
+            <h1>음악감상</h1>
+            <p>잠시 쉬어 가며 클래식 음악을 들어 보세요.</p>
+            <svg class="staff" viewBox="0 0 320 22" aria-hidden="true">
+                <g stroke="#ffffff" stroke-width="1"><line x1="0" y1="3" x2="320" y2="3"/><line x1="0" y1="8" x2="320" y2="8"/><line x1="0" y1="13" x2="320" y2="13"/><line x1="0" y1="18" x2="320" y2="18"/></g>
+                <g fill="#f6d77a"><ellipse cx="110" cy="13" rx="4" ry="3"/><ellipse cx="150" cy="8" rx="4" ry="3"/><ellipse cx="190" cy="10.5" rx="4" ry="3"/><ellipse cx="230" cy="5.5" rx="4" ry="3"/></g>
+            </svg>
+        </section>
+
+        <!-- 처음에는 썸네일만 보이고, 재생 버튼을 누르면 이 자리에서 영상이 재생됨 -->
+        <div class="player" id="player" data-video="24KcTbHJXlM">
+            <img src="https://i.ytimg.com/vi/24KcTbHJXlM/hqdefault.jpg" alt="Bucket Classical Music 영상 썸네일">
+            <button class="play-btn" type="button" id="play-btn" aria-label="영상 재생">
+                <span class="circle"><svg width="34" height="34" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg></span>
+                <span class="label">이 화면에서 바로 재생</span>
+            </button>
+        </div>
+
+        <section class="about">
+            <div class="about-text">
+                <span class="kicker">지금 감상 중</span>
+                <h2>Bucket Classical Music</h2>
+                <p>재생이 안 되면 YouTube에서 크게 보세요.</p>
+            </div>
+            <a class="pill yt" href="https://www.youtube.com/watch?v=24KcTbHJXlM" target="_blank" rel="noopener noreferrer">
+                <svg width="22" height="16" viewBox="0 0 22 16" aria-hidden="true"><rect width="22" height="16" rx="4" fill="#ff0000"/><path d="M9 4.5v7l6-3.5z" fill="#fff"/></svg>
+                YouTube에서 크게 보기
+            </a>
+        </section>
+    </main>
+
+    <footer>세종호랑이</footer>
+
+    <script>
+        // 재생 버튼을 누르면 썸네일 자리에 유튜브 플레이어를 넣어 바로 재생
+        (function () {
+            const box = document.getElementById('player');
+            const btn = document.getElementById('play-btn');
+            if (!box || !btn) return;
+            btn.addEventListener('click', function () {
+                const id = box.dataset.video;
+                const f = document.createElement('iframe');
+                f.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0';
+                f.title = 'Bucket Classical Music';
+                f.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+                f.allowFullscreen = true;
+                box.innerHTML = '';
+                box.appendChild(f);
+                f.focus();
+            });
+        })();
+    </script>
+</body>
+</html>
