@@ -83,7 +83,7 @@
   --sub-bg: #ffffff;
   --sub-ink: #1c1f24;        /* 흰 바탕일 때 상단 메뉴 글자 */
   --sub-soft: #8a8f96;       /* 하위 메뉴 글자 (엷은 밝기) */
-  --sub-hover: #1c1f24;      /* 하위 메뉴에 마우스를 올렸을 때 */
+  --sub-hover: #1f3f9a;      /* 하위 메뉴에 마우스를 올렸을 때 (진한 파랑 + 굵게) */
 }
 .top-head { position: relative; z-index: 4; }
 .top-head .top-bar { transition: background-color .2s ease; }
@@ -96,9 +96,10 @@
 .top-head.is-open .logo-mark { background: rgba(28, 31, 36, .35); }
 .top-head.is-open #user-info { color: var(--sub-soft); }
 .top-head.is-open .menu-btn:focus-visible { outline-color: var(--sub-ink); }
-/* 누른 메뉴는 테두리 상자로 표시 */
-.top-head.is-open .menu-btn[aria-expanded="true"] { border-color: var(--sub-ink); }
-.top-head.is-open .menu-btn:hover { border-bottom-color: var(--sub-ink); }
+/* 열렸을 때 상단 메뉴는 밑줄·상자 없이 글자만 */
+.top-head.is-open .menu-btn,
+.top-head.is-open .menu-btn:hover,
+.top-head.is-open .menu-btn[aria-expanded="true"] { border-color: transparent; }
 .top-head .menu-btn::after { display: none !important; }   /* ▼ 표시 숨김 */
 
 /* 하위 메뉴 패널 */
@@ -137,8 +138,7 @@
 .top-head .mega-empty { margin: 0; }
 .top-head .mega .tree a svg { display: none; }
 .top-head .mega .tree a:hover,
-.top-head .mega .tree a:focus-visible { color: var(--sub-hover); outline: none; }
-.top-head .mega-col.is-active .tree a { color: #5f646b; }   /* 누른 메뉴의 하위 목록은 조금 더 진하게 */
+.top-head .mega .tree a:focus-visible { color: var(--sub-hover); font-weight: 700; outline: none; }
 
 /* ---------- 가운데 문구 ---------- */
 .top-hero {

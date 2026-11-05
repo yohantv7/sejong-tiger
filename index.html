@@ -332,7 +332,7 @@
             });
         })();
 
-        // 상단 메뉴: 누르면 하위 목록 패널을 펼치고, 누른 메뉴의 칸을 강조
+        // 상단 메뉴: 커서를 올리거나 누르면 하위 목록 패널을 펼침 (finetnc 방식)
         (function () {
             const panel = document.getElementById('mega');
             const btns = document.querySelectorAll('.menu-btn[data-menu]');
@@ -352,7 +352,8 @@
                     const b = btnList[i], next = btnList[i + 1];
                     if (narrow || !b) { col.style.left = ''; col.style.maxWidth = ''; return; }
                     const r = b.getBoundingClientRect();
-                    col.style.left = (r.left - base) + 'px';
+                    const inset = b.clientLeft + parseFloat(getComputedStyle(b).paddingLeft || 0); // 메뉴 글자 시작점에 맞춤
+                    col.style.left = (r.left + inset - base) + 'px';
                     // 다음 메뉴와 같은 줄이면 그 앞에서 줄바꿈
                     const nr = next && next.getBoundingClientRect();
                     col.style.maxWidth = (nr && Math.abs(nr.top - r.top) < 4) ? (nr.left - r.left - 16) + 'px' : '220px';
@@ -378,17 +379,35 @@
                 if (window.matchMedia('(max-width: 720px)').matches && col) col.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
                 return first;
             }
+            // 마우스가 있는 큰 화면: 상단바에 커서를 올리면 전체 하위 메뉴가 열리고, 벗어나면 닫힘
+            const hoverMode = window.matchMedia('(hover: hover) and (min-width: 721px)');
+            let leaveTimer = null;
+            if (head) {
+                head.addEventListener('mouseenter', function () {
+                    if (!hoverMode.matches) return;
+                    clearTimeout(leaveTimer);
+                    if (panel.hidden) open(null);
+                });
+                head.addEventListener('mouseleave', function () {
+                    if (!hoverMode.matches) return;
+                    leaveTimer = setTimeout(close, 120);
+                });
+            }
+            // 휴대폰·키보드: 누르면 열고 다시 누르면 닫음
             btns.forEach(function (b) {
-                b.addEventListener('click', function () { current === b.dataset.menu ? close() : open(b.dataset.menu); });
+                b.addEventListener('click', function () {
+                    if (hoverMode.matches) { open(b.dataset.menu); return; }
+                    current === b.dataset.menu ? close() : open(b.dataset.menu);
+                });
             });
             document.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape' && current) {
-                    const b = document.querySelector('.menu-btn[data-menu="' + current + '"]');
+                if (e.key === 'Escape' && !panel.hidden) {
+                    const b = current && document.querySelector('.menu-btn[data-menu="' + current + '"]');
                     close(); if (b) b.focus();
                 }
             });
             document.addEventListener('click', function (e) {
-                if (current && !panel.contains(e.target) && !e.target.closest('.menu-btn[data-menu]')) close();
+                if (!panel.hidden && !(head && head.contains(e.target))) close();
             });
         })();
 
