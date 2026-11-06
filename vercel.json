@@ -1,0 +1,6 @@
+{
+  "redirects": [
+    { "source": "/photo", "destination": "https://id-photo-helper.vercel.app/", "permanent": false },
+    { "source": "/photo/:path*", "destination": "https://id-photo-helper.vercel.app/:path*", "permanent": false }
+  ]
+}
