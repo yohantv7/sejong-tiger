@@ -8,6 +8,19 @@ DirectoryIndex index.html
     # RewriteCond %{HTTPS} !=on
     # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
+    # hpmaker.co.kr 로 들어온 접속은 /hpmaker/ 폴더의 파일을 보여줌 (주소창은 그대로)
+    #  - www.hpmaker.co.kr 은 hpmaker.co.kr 로 통일
+    RewriteCond %{HTTP_HOST} ^www\.hpmaker\.co\.kr$ [NC]
+    RewriteRule ^(.*)$ %{REQUEST_SCHEME}://hpmaker.co.kr/$1 [L,R=301]
+    #  - 폴더 주소 끝에 / 가 없으면 먼저 붙여줌 (예: /products → /products/)
+    RewriteCond %{HTTP_HOST} (^|\.)hpmaker\.co\.kr$ [NC]
+    RewriteCond %{REQUEST_URI} !^/hpmaker/
+    RewriteCond %{REQUEST_URI} !(\.[A-Za-z0-9]+|/)$
+    RewriteRule ^(.*)$ /$1/ [L,R=301]
+    RewriteCond %{HTTP_HOST} (^|\.)hpmaker\.co\.kr$ [NC]
+    RewriteCond %{REQUEST_URI} !^/hpmaker/
+    RewriteRule ^(.*)$ hpmaker/$1 [L]
+
     # 주식정보 페이지의 공시 데이터: /api/fundamentals → php/fundamentals.php
     RewriteRule ^api/fundamentals/?$ php/fundamentals.php [L,QSA]
 </IfModule>
