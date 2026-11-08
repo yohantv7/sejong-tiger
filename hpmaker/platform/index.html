@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>hpmaker 플랫폼 — 누구나 사고 파는 장터</title>
+    <meta name="description" content="세종호랑이 hpmaker 플랫폼: 디자인, 웹개발, AI 스킬, 디지털 굿즈와 중고물품을 누구나 올리고 사고 파는 장터">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/app.css?v=1">
+</head>
+<body>
+    <header class="bar">
+        <div class="bar-in">
+            <a class="brand" href="#/" aria-label="hpmaker 플랫폼 처음으로">
+                <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+                <span class="brand-text">hpmaker<b>/platform</b></span>
+            </a>
+            <form class="search" id="searchForm" role="search">
+                <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                <input id="q" type="search" placeholder="무엇을 찾으세요?" autocomplete="off" maxlength="40" aria-label="상품 검색">
+            </form>
+            <nav class="bar-actions">
+                <a class="btn btn-amber" href="#/sell">판매하기</a>
+                <a class="bar-link" href="#/my" id="myLink">내 거래<span class="badge" id="myBadge" hidden></span></a>
+                <button class="bar-link" type="button" id="loginBtn">로그인</button>
+                <button class="bar-link" type="button" id="logoutBtn" hidden>로그아웃</button>
+            </nav>
+        </div>
+    </header>
+
+    <main id="view" class="wrap" tabindex="-1"></main>
+
+    <footer class="foot wrap">
+        <p><a href="/">세종호랑이</a> · hpmaker 플랫폼은 회원끼리 직접 사고 파는 장터입니다. 대금은 판매자와 구매자가 직접 주고받으며, 거래 책임은 당사자에게 있습니다.</p>
+    </footer>
+
+    <!-- 로그인 창 (세종호랑이 계정과 같습니다) -->
+    <dialog id="loginDlg" class="dlg">
+        <form method="dialog" class="dlg-close"><button aria-label="닫기">×</button></form>
+        <h2 id="loginTitle">로그인</h2>
+        <p class="muted">세종호랑이 계정으로 그대로 이용할 수 있습니다.</p>
+        <form id="loginForm" class="form">
+            <label>이메일<input type="email" name="email" required autocomplete="email"></label>
+            <label>비밀번호<input type="password" name="password" required minlength="6" autocomplete="current-password"></label>
+            <p class="err" id="loginErr" role="alert"></p>
+            <button class="btn btn-dark btn-block" type="submit" id="loginSubmit">로그인</button>
+        </form>
+        <p class="switch"><span id="switchText">아직 계정이 없으신가요?</span> <button type="button" class="linkish" id="switchMode">회원가입</button></p>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="assets/app.js?v=1"></script>
+</body>
+</html>

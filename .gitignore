@@ -1,3 +1,8 @@
 php/config.php
 php/cache/*
 !php/cache/.htaccess
+hpmaker/platform/inc/config.php
+hpmaker/platform/cache/*
+!hpmaker/platform/cache/.htaccess
+hpmaker/platform/uploads/*
+!hpmaker/platform/uploads/.htaccess

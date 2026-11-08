@@ -1,0 +1,8 @@
+# 이 폴더는 웹에서 열 수 없습니다.
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>
