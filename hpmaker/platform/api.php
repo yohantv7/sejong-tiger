@@ -241,8 +241,6 @@ function save_image($f) {
             imagecopyresampled($dst, $src, 0, 0, 0, 0, $nw, $nh, $w, $h);
             $path = "$dir/$name.jpg";
             imagejpeg($dst, $path, 82);
-            imagedestroy($src);
-            imagedestroy($dst);
             return "uploads/$sub/$name.jpg";
         }
     }

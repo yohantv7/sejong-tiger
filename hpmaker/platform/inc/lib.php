@@ -4,6 +4,10 @@
  * 가비아 웹호스팅(Apache + PHP + MySQL) 환경을 기준으로 작성했습니다.
  */
 
+// PHP 경고·안내 문구가 화면으로 나가면 JSON 응답이 깨지므로, 화면에는 내보내지 않고 서버 기록에만 남깁니다.
+@ini_set('display_errors', '0');
+@ini_set('log_errors', '1');
+
 const PF_CATEGORIES = ['design', 'web', 'ai', 'doc', 'digital', 'used', 'etc'];
 const PF_CACHE_DIR = __DIR__ . '/../cache';
 const PF_UPLOAD_DIR = __DIR__ . '/../uploads';
@@ -32,10 +36,10 @@ function pf_db() {
                     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                     PDO::ATTR_EMULATE_PREPARES => false,
                     PDO::ATTR_STRINGIFY_FETCHES => false,
-                    // 가비아는 한국 시간이지만, 혹시 몰라 DB 시간을 한국 시간(+09:00)으로 맞춥니다.
-                    PDO::MYSQL_ATTR_INIT_COMMAND => "SET time_zone = '+09:00'",
                 ]
             );
+            // DB 시간을 한국 시간(+09:00)으로 맞춥니다.
+            $pdo->exec("SET time_zone = '+09:00'");
         } catch (PDOException $e) {
             error_log('pf db connect: ' . $e->getMessage());
             pf_fail(503, '데이터베이스에 연결할 수 없습니다.');
@@ -127,7 +131,6 @@ function pf_http_get($url) {
         $res = curl_exec($ch);
         $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $hsize = (int) curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-        curl_close($ch);
         if ($res === false) return [0, '', ''];
         return [$code, substr($res, $hsize), substr($res, 0, $hsize)];
     }
