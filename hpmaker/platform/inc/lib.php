@@ -108,7 +108,7 @@ function pf_cache_gc() {
 
 /** 공개 JSON 을 ETag 와 함께 보냅니다. 내용이 같으면 304 로 본문 없이 응답해 더 빠릅니다. */
 function pf_send_public_json($json, $maxAge = 5) {
-    $etag = '"' . md5($json) . '"';
+    $etag = '"p2-' . md5($json) . '"';   // p2: PHP 8.5 수정 이후 버전 (예전에 저장된 응답을 다시 쓰지 않도록)
     header('ETag: ' . $etag);
     header('Cache-Control: public, max-age=' . $maxAge);
     if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && trim($_SERVER['HTTP_IF_NONE_MATCH']) === $etag) {
