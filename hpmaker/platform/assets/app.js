@@ -113,16 +113,20 @@
     if (typeof dlg.showModal === 'function') dlg.showModal(); else dlg.setAttribute('open', '');
     setTimeout(() => dlg.querySelector('input[name=email]').focus(), 30);
   }
-  $('#loginBtn').addEventListener('click', () => openLogin());
-  $('#logoutBtn').addEventListener('click', async () => { await auth.signOut(); toast('로그아웃했습니다.'); location.hash = '#/'; });
-  $('#switchMode').addEventListener('click', () => {
-    signupMode = !signupMode;
+  $('#auth-btn').addEventListener('click', async () => {
+    if (auth.currentUser) { await auth.signOut(); toast('로그아웃했습니다.'); location.hash = '#/'; return; }
+    setMode(false); openLogin();
+  });
+  $('#signup-btn').addEventListener('click', () => { setMode(true); openLogin(); });
+  $('#switchMode').addEventListener('click', () => setMode(!signupMode));
+  function setMode(signup) {
+    signupMode = signup;
     $('#loginTitle').textContent = signupMode ? '회원가입' : '로그인';
     $('#loginSubmit').textContent = signupMode ? '가입하고 시작하기' : '로그인';
     $('#switchText').textContent = signupMode ? '이미 계정이 있으신가요?' : '아직 계정이 없으신가요?';
     $('#switchMode').textContent = signupMode ? '로그인' : '회원가입';
     dlg.querySelector('input[name=password]').autocomplete = signupMode ? 'new-password' : 'current-password';
-  });
+  }
   const FB_ERR = {
     'auth/invalid-credential': '이메일 또는 비밀번호가 맞지 않습니다.',
     'auth/wrong-password': '이메일 또는 비밀번호가 맞지 않습니다.',
@@ -162,17 +166,25 @@
   }
   function paintBadge() {
     const n = state.me ? state.me.to_ship + state.me.to_confirm : 0;
-    const b = $('#myBadge');
-    b.hidden = !n;
-    b.textContent = n > 99 ? '99+' : n;
+    document.querySelectorAll('[data-badge]').forEach(b => {
+      b.hidden = !n;
+      b.textContent = n > 99 ? '99+' : n;
+    });
+  }
+  /** 상단바 로그인 표시: 메인(sjtiger.kr)과 같이 'OOO님, 환영합니다!' + 로그아웃 */
+  function paintAuth(user) {
+    const name = user ? (user.displayName || (state.me && state.me.nickname) || (user.email || '').split('@')[0]) : '';
+    $('#user-info').textContent = user ? name + '님, 환영합니다!' : '';
+    $('#auth-btn').textContent = user ? '로그아웃' : '로그인';
+    $('#signup-btn').hidden = !!user;
   }
 
   let firstAuth = true;
   auth.onAuthStateChanged(async user => {
-    $('#loginBtn').hidden = !!user;
-    $('#logoutBtn').hidden = !user;
+    paintAuth(user);
     state.authReady = true;
     await refreshMe();
+    paintAuth(user);
     if (firstAuth) { firstAuth = false; route(); return; }
     // 로그인 상태가 바뀌면 지금 화면을 다시 그립니다(내 상품 여부 등이 달라지므로).
     if (!/^#\/sell/.test(location.hash)) route();
@@ -194,6 +206,10 @@
     if (!state.authReady) return;
     stopTimers();
     const h = location.hash || '#/';
+    const isList = !/^#\/(item|sell|my)/.test(h);
+    $('#top').classList.toggle('is-full', isList);       // 목록 화면에서만 사진을 화면 가득
+    $('#hero').hidden = !isList;
+    view.classList.toggle('list-page', isList);
     let m;
     if ((m = h.match(/^#\/item\/(\d+)$/))) return showItem(+m[1]);
     if ((m = h.match(/^#\/sell(?:\/(\d+))?$/))) return showSell(m[1] ? +m[1] : null);
@@ -209,29 +225,39 @@
     setTitle('');
     const f = state.filters;
     view.innerHTML = `
-      ${f.q ? `<section class="hero"><div><h1>‘${esc(f.q)}’ 검색 결과</h1></div></section>` : `
-      <section class="banner">
-        <div class="banner-text">
-          <p class="banner-kicker">hpmaker 플랫폼</p>
-          <h1>누구나 팔고,<br>누구나 사는 장터</h1>
-          <p>디자인·웹개발·AI 스킬부터 중고물품까지.<br>올리는 데 1분이면 충분합니다.</p>
-          <a class="btn btn-amber" href="#/sell">지금 판매하기</a>
-        </div>
-      </section>`}
-      <div class="filters">
-        <div class="chips" role="group" aria-label="분류">
-          <button class="chip" data-cat="" aria-pressed="${!f.cat}">전체</button>
-          ${CATS.map(c => `<button class="chip" data-cat="${c.key}" aria-pressed="${f.cat === c.key}">${esc(c.label)}</button>`).join('')}
-        </div>
-        <select class="sort" id="sort" aria-label="정렬">
-          <option value="new">최신순</option><option value="popular">많이 팔린 순</option>
-          <option value="low">낮은 가격순</option><option value="high">높은 가격순</option>
-        </select>
-      </div>
-      <div class="grid" id="grid"></div>
-      <div class="more"><button class="btn btn-line" id="moreBtn" hidden>더 보기</button></div>`;
+      <div class="shop" id="results">
+        <aside class="side" aria-label="분류와 정렬">
+          <h2 class="side-title">분류</h2>
+          <div class="cat-list" role="group" aria-label="분류">
+            <button class="chip" data-cat="" aria-pressed="${!f.cat}">전체</button>
+            ${CATS.map(c => `<button class="chip" data-cat="${c.key}" aria-pressed="${f.cat === c.key}">${esc(c.label)}</button>`).join('')}
+          </div>
+          <label class="side-sort">정렬
+            <select class="sort" id="sort">
+              <option value="new">최신순</option><option value="popular">많이 팔린 순</option>
+              <option value="low">낮은 가격순</option><option value="high">높은 가격순</option>
+            </select>
+          </label>
+          <div class="side-actions">
+            <a class="btn btn-amber" href="#/sell">판매하기</a>
+            <a class="btn btn-line" href="#/my">내 거래<span class="badge" data-badge hidden></span></a>
+          </div>
+        </aside>
+        <section class="shop-main">
+          <div class="results-head" id="resultsHead"></div>
+          <div class="grid" id="grid"></div>
+          <div class="more"><button class="btn btn-line" id="moreBtn" hidden>더 보기</button></div>
+        </section>
+      </div>`;
+    paintBadge();
+    paintHead();
     $('#sort').value = f.sort;
-    view.querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => { f.cat = b.dataset.cat; state.list = null; showList(); }));
+    // 분류·정렬을 바꿔도 화면을 맨 위로 올리지 않고 목록만 새로 읽습니다.
+    view.querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => {
+      f.cat = b.dataset.cat; state.list = null;
+      view.querySelectorAll('.chip').forEach(x => x.setAttribute('aria-pressed', x === b));
+      paintHead(); loadList(false);
+    }));
     $('#sort').addEventListener('change', e => { f.sort = e.target.value; state.list = null; loadList(false); });
     $('#moreBtn').addEventListener('click', () => loadList(true));
 
@@ -245,6 +271,18 @@
       window.scrollTo(0, 0);
       loadList(false);
     }
+  }
+
+  function paintHead() {
+    const f = state.filters;
+    const head = $('#resultsHead');
+    if (!head) return;
+    const label = f.cat ? (CAT[f.cat] || {}).label : '전체 상품';
+    head.innerHTML = f.q
+      ? `<h2>‘${esc(f.q)}’ 검색 결과${f.cat ? ` <span class="muted">· ${esc(label)}</span>` : ''}</h2><button class="linkish" id="clearQ">검색 지우기</button>`
+      : `<h2>${esc(label)}</h2>`;
+    const c = $('#clearQ');
+    if (c) c.addEventListener('click', () => { $('#q').value = ''; state.filters.q = ''; state.list = null; paintHead(); loadList(false); });
   }
 
   function skeleton(n) {
@@ -315,23 +353,73 @@
     if (e.target.closest && e.target.closest('a.card') && state.list) state.list.scroll = window.scrollY;
   });
 
-  // 검색: 글자를 칠 때마다 0.25초 기다렸다가 결과를 바꿉니다.
+  // 검색: 사진 위 검색창. 글자를 칠 때마다 0.25초 뒤 목록을 바꾸고, Enter(검색)를 누르면 결과로 내려갑니다.
   let searchTimer;
-  $('#q').addEventListener('input', e => {
-    clearTimeout(searchTimer);
-    searchTimer = setTimeout(() => {
-      state.filters.q = e.target.value.trim();
-      state.list = null;
-      if (location.hash && location.hash !== '#/') location.hash = '#/'; else showList();
-    }, 250);
-  });
-  $('#searchForm').addEventListener('submit', e => {
-    e.preventDefault();
-    clearTimeout(searchTimer);
+  function runSearch(scroll) {
     state.filters.q = $('#q').value.trim();
     state.list = null;
-    if (location.hash && location.hash !== '#/') location.hash = '#/'; else showList();
-  });
+    if (!$('#grid')) { location.hash = '#/'; return; }
+    paintHead();
+    loadList(false);
+    if (scroll) $('#results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  $('#q').addEventListener('input', () => { clearTimeout(searchTimer); searchTimer = setTimeout(() => runSearch(false), 250); });
+  $('#searchForm').addEventListener('submit', e => { e.preventDefault(); clearTimeout(searchTimer); runSearch(true); });
+
+  /* ---------------- 상단 메뉴 (메인 sjtiger.kr 과 같은 동작) ----------------
+   * 큰 화면: 상단바에 마우스를 올리면 하위 메뉴가 펼쳐지고, 벗어나면 닫힘
+   * 휴대폰·키보드: 메뉴를 누르면 열고 다시 누르면 닫음 */
+  (function () {
+    const panel = $('#mega');
+    const btns = document.querySelectorAll('.menu-btn[data-menu]');
+    if (!panel) return;
+    const head = panel.closest('.top-head');
+    const grid = panel.querySelector('.mega-grid');
+    let current = null;
+    function layout() {
+      if (panel.hidden || !grid) return;
+      const narrow = matchMedia('(max-width: 720px)').matches;
+      const base = grid.getBoundingClientRect().left;
+      const list = Array.prototype.slice.call(btns);
+      let tallest = 0;
+      panel.querySelectorAll('.mega-col').forEach(col => {
+        const i = list.findIndex(x => x.dataset.menu === col.dataset.col);
+        const b = list[i], next = list[i + 1];
+        if (narrow || !b) { col.style.left = ''; col.style.maxWidth = ''; return; }
+        const r = b.getBoundingClientRect();
+        const inset = b.clientLeft + parseFloat(getComputedStyle(b).paddingLeft || 0);
+        col.style.left = (r.left + inset - base) + 'px';
+        const nr = next && next.getBoundingClientRect();
+        col.style.maxWidth = (nr && Math.abs(nr.top - r.top) < 4) ? (nr.left - r.left - 16) + 'px' : '220px';
+        tallest = Math.max(tallest, col.offsetHeight);
+      });
+      grid.style.minHeight = narrow ? '' : tallest + 'px';
+    }
+    addEventListener('resize', layout);
+    function close() {
+      head.classList.remove('is-open');
+      panel.hidden = true; current = null;
+      btns.forEach(b => b.setAttribute('aria-expanded', 'false'));
+    }
+    function open(key) {
+      panel.hidden = false; current = key;
+      head.classList.add('is-open');
+      btns.forEach(b => b.setAttribute('aria-expanded', b.dataset.menu === key ? 'true' : 'false'));
+      layout();
+    }
+    const hoverMode = matchMedia('(hover: hover) and (min-width: 721px)');
+    let leaveTimer = null;
+    head.addEventListener('mouseenter', () => { if (!hoverMode.matches) return; clearTimeout(leaveTimer); if (panel.hidden) open(null); });
+    head.addEventListener('mouseleave', () => { if (!hoverMode.matches) return; leaveTimer = setTimeout(close, 120); });
+    btns.forEach(b => b.addEventListener('click', () => {
+      if (hoverMode.matches) { open(b.dataset.menu); return; }
+      current === b.dataset.menu ? close() : open(b.dataset.menu);
+    }));
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && !panel.hidden) { const b = current && document.querySelector('.menu-btn[data-menu="' + current + '"]'); close(); if (b) b.focus(); }
+    });
+    document.addEventListener('click', e => { if (!panel.hidden && !head.contains(e.target)) close(); });
+  })();
 
   /* ---------------- 상세 ---------------- */
   async function showItem(id) {

@@ -7,30 +7,87 @@
     <meta name="description" content="세종호랑이 hpmaker 플랫폼: 디자인, 웹개발, AI 스킬, 디지털 굿즈와 중고물품을 누구나 올리고 사고 파는 장터">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
-    <link rel="preload" as="image" href="assets/hero.jpg" media="(min-width: 761px)">
-    <link rel="preload" as="image" href="assets/hero-sm.jpg" media="(max-width: 760px)">
-    <link rel="stylesheet" href="assets/app.css?v=2">
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="preload" as="image" href="assets/hero.jpg" >
+    <link rel="stylesheet" href="assets/site-top.css?v=3">
+    <link rel="stylesheet" href="assets/app.css?v=3">
 </head>
 <body>
-    <header class="bar">
-        <div class="bar-in">
-            <a class="brand" href="#/" aria-label="hpmaker 플랫폼 처음으로">
-                <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-                <span class="brand-text">hpmaker<b>/platform</b></span>
+    <!-- 상단바: 세종호랑이 메인(sjtiger.kr)과 같은 구성 -->
+    <div class="top" id="top">
+        <div class="top-head">
+        <header class="top-bar">
+            <a class="logo" href="/" aria-label="세종호랑이 홈">
+                <span class="logo-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+                <span class="logo-text">세종호랑이</span>
             </a>
-            <form class="search" id="searchForm" role="search">
-                <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-                <input id="q" type="search" placeholder="무엇을 찾으세요?" autocomplete="off" maxlength="40" aria-label="상품 검색">
-            </form>
-            <nav class="bar-actions">
-                <a class="btn btn-amber" href="#/sell">판매하기</a>
-                <a class="bar-link" href="#/my" id="myLink">내 거래<span class="badge" id="myBadge" hidden></span></a>
-                <button class="bar-link" type="button" id="loginBtn">로그인</button>
-                <button class="bar-link" type="button" id="logoutBtn" hidden>로그아웃</button>
+            <nav class="menu" aria-label="주 메뉴">
+                <button type="button" class="menu-btn" data-menu="saas" aria-expanded="false" aria-controls="mega">SAAS</button>
+                <button type="button" class="menu-btn" data-menu="home" aria-expanded="false" aria-controls="mega">홈페이지</button>
+                <button type="button" class="menu-btn" data-menu="shop" aria-expanded="false" aria-controls="mega">쇼핑몰</button>
+                <button type="button" class="menu-btn" data-menu="platform" aria-expanded="false" aria-controls="mega">플랫폼</button>
+                <button type="button" class="menu-btn" data-menu="etc" aria-expanded="false" aria-controls="mega">기타</button>
+                <div class="auth-cell">
+                    <span id="user-info"></span>
+                    <button id="auth-btn" type="button">로그인</button>
+                    <button id="signup-btn" type="button">회원가입</button>
+                </div>
             </nav>
+        </header>
+
+        <div class="cell mega" id="mega" hidden>
+            <div class="mega-grid">
+                <section class="mega-col" data-col="saas">
+                    <h2>SAAS</h2>
+                    <ul class="tree">
+                        <li><a href="/photo/" target="_blank" rel="noopener">증명사진 만들기<svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 17L17 7M9 7h8v8"/></svg></a></li>
+                        <li><a href="https://clientflow-team.vercel.app" target="_blank" rel="noopener noreferrer">업무관리기<svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 17L17 7M9 7h8v8"/></svg></a></li>
+                        <li><a href="https://bomnote-teacher.dark-bread-0915.chatgpt.site/" target="_blank" rel="noopener noreferrer">어린이집용 알림장<svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 17L17 7M9 7h8v8"/></svg></a></li>
+                    </ul>
+                </section>
+                <section class="mega-col" data-col="home">
+                    <h2>홈페이지</h2>
+                    <ul class="tree"><li><a href="/hpmaker/" target="_blank" rel="noopener noreferrer">hpmaker<svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 17L17 7M9 7h8v8"/></svg></a></li></ul>
+                </section>
+                <section class="mega-col" data-col="shop">
+                    <h2>쇼핑몰</h2>
+                    <ul class="tree"><li><a href="/hpmaker/shop/" target="_blank" rel="noopener noreferrer">hpmaker<wbr>/shop<svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 17L17 7M9 7h8v8"/></svg></a></li></ul>
+                </section>
+                <section class="mega-col" data-col="platform">
+                    <h2>플랫폼</h2>
+                    <ul class="tree"><li><a href="/hpmaker/platform/">hpmaker<wbr>/platform<svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 17L17 7M9 7h8v8"/></svg></a></li></ul>
+                </section>
+                <section class="mega-col" data-col="etc">
+                    <h2>기타</h2>
+                    <ul class="tree">
+                        <li><a href="/stock.html">주식정보</a></li>
+                        <li><a href="/music.html">음악감상</a></li>
+                        <li><a href="/senior.html">시니어생활</a></li>
+                        <li><a href="/marketing.html">마케팅</a></li>
+                        <li><a href="/partners.html">PARTNERS</a></li>
+                        <li><a href="/talk.html" target="_blank" rel="noopener">소통의 창</a></li>
+                    </ul>
+                </section>
+            </div>
         </div>
-    </header>
+        </div>
+
+        <!-- 첫 화면 사진 위 문구 (목록 화면에서만 보임) -->
+        <section class="top-hero" id="hero" hidden>
+            <p class="top-eyebrow">BUY <span>&amp;</span> SELL</p>
+            <h1>누구나 팔고, 누구나 사는 장터</h1>
+            <p class="top-sub">디자인·웹개발·AI 스킬부터 중고물품까지, 올리는 데 1분이면 충분합니다.</p>
+            <form class="hero-search" id="searchForm" role="search">
+                <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                <input id="q" type="search" placeholder="무엇을 찾으세요?" autocomplete="off" maxlength="40" aria-label="상품 검색">
+                <button type="submit">검색</button>
+            </form>
+            <div class="hero-actions">
+                <a class="hero-btn hero-btn-amber" href="#/sell">판매하기</a>
+                <a class="hero-btn" href="#/my">내 거래<span class="badge" data-badge hidden></span></a>
+            </div>
+        </section>
+    </div>
 
     <main id="view" class="wrap" tabindex="-1"></main>
 
@@ -56,6 +113,6 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="assets/app.js?v=2"></script>
+    <script src="assets/app.js?v=3"></script>
 </body>
 </html>
