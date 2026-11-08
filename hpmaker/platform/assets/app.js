@@ -209,12 +209,15 @@
     setTitle('');
     const f = state.filters;
     view.innerHTML = `
-      <section class="hero">
-        <div>
-          <h1>${f.q ? `‘${esc(f.q)}’ 검색 결과` : '누구나 팔고, 누구나 사는 장터'}</h1>
-          <p>디자인·웹개발·AI 스킬부터 중고물품까지. 올리는 데 1분이면 충분합니다.</p>
+      ${f.q ? `<section class="hero"><div><h1>‘${esc(f.q)}’ 검색 결과</h1></div></section>` : `
+      <section class="banner">
+        <div class="banner-text">
+          <p class="banner-kicker">hpmaker 플랫폼</p>
+          <h1>누구나 팔고,<br>누구나 사는 장터</h1>
+          <p>디자인·웹개발·AI 스킬부터 중고물품까지.<br>올리는 데 1분이면 충분합니다.</p>
+          <a class="btn btn-amber" href="#/sell">지금 판매하기</a>
         </div>
-      </section>
+      </section>`}
       <div class="filters">
         <div class="chips" role="group" aria-label="분류">
           <button class="chip" data-cat="" aria-pressed="${!f.cat}">전체</button>
